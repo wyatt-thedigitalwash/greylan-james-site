@@ -5,7 +5,7 @@ export default function NotFound() {
     <main className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
       <h1 className="text-4xl font-bold mb-4">Page not found</h1>
       <p className="text-lg text-gray-600 mb-8">
-        The page you're looking for doesn't exist.
+        The page you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link
         href="/"
