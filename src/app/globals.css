@@ -11,7 +11,7 @@
   --color-brand-red: var(--brand-red);
   --color-brand-black: var(--brand-black);
   --font-headline: var(--font-knockout);
-  --font-body: var(--font-archivo-narrow);
+  --font-body: "acumin-pro-condensed";
 }
 
 html {
@@ -21,7 +21,7 @@ html {
 body {
   background-color: var(--brand-black);
   color: var(--brand-black);
-  font-family: var(--font-archivo-narrow), "Arial Narrow", system-ui, sans-serif;
+  font-family: "acumin-pro-condensed", "Arial Narrow", system-ui, sans-serif;
   font-size: 18px;
   line-height: 1.6;
 }
