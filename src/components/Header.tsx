@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaInstagram, FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from 'react-icons/fa6';
@@ -23,6 +23,20 @@ const socialLinks = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const openMenu = useCallback(() => {
+    setMenuOpen(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setMenuVisible(true));
+    });
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setMenuVisible(false);
+    const timeout = setTimeout(() => setMenuOpen(false), 400);
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     if (menuOpen) {
@@ -37,7 +51,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-brand-black">
-      <div className="flex h-16 items-center justify-between px-4 md:px-12">
+      <div className="relative z-50 flex h-16 items-center justify-between px-4 md:px-12 bg-brand-black">
         <Link href="/" className="shrink-0">
           <Image
             src="/logos/GreylanJames_Logo_White.png"
@@ -61,56 +75,71 @@ export default function Header() {
           ))}
         </nav>
 
+        {/* Animated hamburger / X button */}
         <button
           type="button"
-          onClick={() => setMenuOpen(true)}
-          className="md:hidden flex flex-col justify-center gap-1.5 p-2 text-white"
-          aria-label="Open menu"
+          onClick={() => (menuOpen ? closeMenu() : openMenu())}
+          className="md:hidden relative flex flex-col justify-center items-center w-10 h-10 p-2 text-white"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
         >
-          <span className="block h-0.5 w-6 bg-white" />
-          <span className="block h-0.5 w-6 bg-white" />
-          <span className="block h-0.5 w-6 bg-white" />
+          <span
+            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            style={{
+              transform: menuVisible
+                ? 'rotate(45deg) translateY(0)'
+                : 'rotate(0) translateY(-6px)',
+            }}
+          />
+          <span
+            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            style={{
+              opacity: menuVisible ? 0 : 1,
+              transform: menuVisible ? 'scaleX(0)' : 'scaleX(1)',
+            }}
+          />
+          <span
+            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            style={{
+              transform: menuVisible
+                ? 'rotate(-45deg) translateY(0)'
+                : 'rotate(0) translateY(6px)',
+            }}
+          />
         </button>
       </div>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-brand-black">
-          <div className="flex h-16 items-center justify-between px-4">
-            <Link href="/" onClick={() => setMenuOpen(false)} className="shrink-0">
-              <Image
-                src="/logos/GreylanJames_Logo_White.png"
-                alt="Greylan James"
-                width={180}
-                height={32}
-                className="h-8 w-auto"
-              />
-            </Link>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              className="p-2 text-white"
-              aria-label="Close menu"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-7 h-7">
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
+        <div
+          className="fixed inset-0 top-16 z-40 flex flex-col bg-brand-black transition-opacity duration-400 ease-in-out"
+          style={{ opacity: menuVisible ? 1 : 0 }}
+        >
           <nav className="flex flex-1 flex-col items-center justify-center gap-8">
-            {navLinks.map((link) => (
+            {navLinks.map((link, i) => (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="font-headline text-4xl uppercase tracking-wide text-white hover:text-brand-red transition-colors"
+                onClick={closeMenu}
+                className="font-headline text-4xl uppercase tracking-wide text-white hover:text-brand-red transition-colors duration-300"
+                style={{
+                  opacity: menuVisible ? 1 : 0,
+                  transform: menuVisible ? 'translateY(0)' : 'translateY(12px)',
+                  transition: `opacity 350ms ease ${100 + i * 60}ms, transform 350ms ease ${100 + i * 60}ms, color 300ms`,
+                }}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center justify-center gap-6 pb-12">
+          <div
+            className="flex items-center justify-center gap-6 pb-12"
+            style={{
+              opacity: menuVisible ? 1 : 0,
+              transform: menuVisible ? 'translateY(0)' : 'translateY(8px)',
+              transition: `opacity 350ms ease ${100 + navLinks.length * 60}ms, transform 350ms ease ${100 + navLinks.length * 60}ms`,
+            }}
+          >
             {socialLinks.map((link) => (
               <a
                 key={link.href}
