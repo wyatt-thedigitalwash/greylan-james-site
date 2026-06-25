@@ -73,6 +73,21 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+
+          <div className="flex items-center gap-3 ml-2">
+            {socialLinks.map(({ href, label, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="text-white/70 hover:text-white transition-colors"
+              >
+                <Icon className="w-4 h-4" />
+              </a>
+            ))}
+          </div>
         </nav>
 
         {/* Animated hamburger / X button */}
