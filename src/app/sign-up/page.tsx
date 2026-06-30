@@ -49,7 +49,6 @@ export default function SignUpPage() {
           Be the first to know about new music, tour dates, and more.
         </p>
 
-        {/* TODO: Wire to Laylo and Mailchimp when integration is ready */}
         <SignUpForm />
       </div>
     </section>

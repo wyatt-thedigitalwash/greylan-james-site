@@ -1,34 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// In-memory rate limiting: IP -> { count, resetAt }
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 3;
-const RATE_LIMIT_WINDOW = 5 * 60 * 1000; // 5 minutes
+// ---------- Rate limiting (in-memory, resets on cold start) ----------
+const rateMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 3;
+const RATE_WINDOW = 5 * 60 * 1000; // 5 minutes
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
+  const entry = rateMap.get(ip);
   if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    rateMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
     return false;
   }
-
-  entry.count++;
-  return entry.count > RATE_LIMIT_MAX;
+  entry.count += 1;
+  return entry.count > RATE_LIMIT;
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// ---------- Validation helpers ----------
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME = 100;
+const MAX_EMAIL = 254;
+const MAX_ZIP = 20;
+const MAX_PHONE = 30;
+const MAX_COUNTRY = 100;
 
+function sanitize(value: unknown, maxLen: number): string {
+  if (typeof value !== 'string') return '';
+  return value.trim().slice(0, maxLen);
+}
+
+// ---------- Handler ----------
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown';
-
+  // Rate limit by IP
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
   if (isRateLimited(ip)) {
     return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
+      { success: false, error: 'Too many requests. Please try again later.' },
       { status: 429 }
     );
   }
@@ -38,77 +47,143 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { error: 'Invalid request body.' },
+      { success: false, error: 'Invalid request' },
       { status: 400 }
     );
   }
 
-  const { email, phone, zip, country, website } = body as {
-    email?: string;
-    phone?: string;
-    zip?: string;
-    country?: string;
-    website?: string;
-  };
-
-  // Honeypot: if the hidden "website" field is filled, silently succeed
-  if (website) {
+  // Honeypot — if the hidden field has a value, silently succeed
+  if (body.website) {
     return NextResponse.json({ success: true });
   }
 
-  // Validate email (required)
-  if (!email || typeof email !== 'string') {
+  // Sanitize and validate
+  const firstName = sanitize(body.firstName, MAX_NAME);
+  const lastName = sanitize(body.lastName, MAX_NAME);
+  const email = sanitize(body.email, MAX_EMAIL);
+  const zipCode = sanitize(body.zipCode, MAX_ZIP);
+  const phone = sanitize(body.phone, MAX_PHONE);
+  const country = sanitize(body.country, MAX_COUNTRY);
+
+  if (!firstName) {
     return NextResponse.json(
-      { error: 'Email address is required.' },
+      { success: false, error: 'First name is required' },
+      { status: 400 }
+    );
+  }
+  if (!lastName) {
+    return NextResponse.json(
+      { success: false, error: 'Last name is required' },
+      { status: 400 }
+    );
+  }
+  if (!email || !EMAIL_RE.test(email)) {
+    return NextResponse.json(
+      { success: false, error: 'A valid email address is required' },
       { status: 400 }
     );
   }
 
-  const trimmedEmail = email.trim();
-  if (trimmedEmail.length > 254) {
+  const API_KEY = process.env.MAILCHIMP_API_KEY;
+  const SERVER = process.env.MAILCHIMP_SERVER_PREFIX;
+  const AUDIENCE = process.env.MAILCHIMP_AUDIENCE_ID;
+
+  if (!API_KEY || !SERVER || !AUDIENCE) {
+    console.error('Missing Mailchimp environment variables');
     return NextResponse.json(
-      { error: 'Email address is too long.' },
-      { status: 400 }
+      { success: false, error: 'Something went wrong' },
+      { status: 500 }
     );
   }
 
-  if (!EMAIL_REGEX.test(trimmedEmail)) {
+  try {
+    const res = await fetch(
+      `https://${SERVER}.api.mailchimp.com/3.0/lists/${AUDIENCE}/members`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${Buffer.from('anystring:' + API_KEY).toString('base64')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email_address: email,
+          status: 'subscribed',
+          tags: ['Greylan James'],
+          merge_fields: {
+            FNAME: firstName,
+            LNAME: lastName,
+            MMERGE14: zipCode,
+            PHONE: phone,
+            MMERGE12: country,
+            MMERGE9: 'greylanjames.com',
+          },
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Laylo subscription (secondary — failures don't affect user response)
+      const LAYLO_KEY = process.env.LAYLO_API_KEY;
+      if (LAYLO_KEY) {
+        try {
+          await fetch('https://laylo.com/api/graphql', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${LAYLO_KEY}`,
+            },
+            body: JSON.stringify({
+              query: 'mutation($email: String) { subscribeToUser(email: $email) }',
+              variables: { email },
+            }),
+          });
+        } catch (err) {
+          console.error('Laylo email error:', err);
+        }
+
+        if (phone) {
+          try {
+            const digits = phone.replace(/\D/g, '');
+            const formatted = digits.startsWith('1') ? `+${digits}` : `+1${digits}`;
+            await fetch('https://laylo.com/api/graphql', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${LAYLO_KEY}`,
+              },
+              body: JSON.stringify({
+                query: 'mutation($phoneNumber: String) { subscribeToUser(phoneNumber: $phoneNumber) }',
+                variables: { phoneNumber: formatted },
+              }),
+            });
+          } catch (err) {
+            console.error('Laylo phone error:', err);
+          }
+        }
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    if (res.status === 400 && data.title === 'Member Exists') {
+      return NextResponse.json(
+        { success: false, error: 'already_subscribed' },
+        { status: 409 }
+      );
+    }
+
+    console.error('Mailchimp error:', data.title, data.detail);
     return NextResponse.json(
-      { error: 'Please enter a valid email address.' },
-      { status: 400 }
+      { success: false, error: 'Something went wrong' },
+      { status: 500 }
+    );
+  } catch (err) {
+    console.error('Subscribe route error:', err);
+    return NextResponse.json(
+      { success: false, error: 'Something went wrong' },
+      { status: 500 }
     );
   }
-
-  // Validate optional fields with length limits
-  if (phone && (typeof phone !== 'string' || phone.length > 20)) {
-    return NextResponse.json(
-      { error: 'Phone number is too long.' },
-      { status: 400 }
-    );
-  }
-
-  if (zip && (typeof zip !== 'string' || zip.length > 20)) {
-    return NextResponse.json(
-      { error: 'Zip code is too long.' },
-      { status: 400 }
-    );
-  }
-
-  if (country && (typeof country !== 'string' || country.length > 100)) {
-    return NextResponse.json(
-      { error: 'Country name is too long.' },
-      { status: 400 }
-    );
-  }
-
-  // TODO: Wire to Laylo and Mailchimp when integration is ready
-  // For now, accept the submission
-  console.log('Sign-up submission:', {
-    email: trimmedEmail,
-    phone: phone || null,
-    zip: zip || null,
-    country: country || null,
-  });
-
-  return NextResponse.json({ success: true });
 }
