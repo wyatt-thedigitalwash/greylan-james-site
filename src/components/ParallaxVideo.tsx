@@ -46,6 +46,7 @@ export default function ParallaxVideo({ src }: { src: string }) {
         muted
         loop
         playsInline
+        aria-hidden="true"
         className="absolute inset-0 w-full h-[120%] object-cover object-right will-change-transform"
       />
     </div>

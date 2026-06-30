@@ -19,7 +19,7 @@ const streamingLinks = [
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-brand-black text-white">
+    <footer className="w-full bg-brand-black text-white" aria-label="Site footer">
       <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:justify-between">
           <div className="flex flex-col items-center gap-6 md:items-start">
@@ -47,10 +47,10 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="text-white hover:text-brand-red transition-colors"
+                  aria-label={`${link.label} (opens in new tab)`}
+                  className="text-white hover:text-brand-red transition-colors p-2"
                 >
-                  <link.Icon className="w-5 h-5" />
+                  <link.Icon className="w-5 h-5" aria-hidden="true" />
                 </a>
               ))}
             </div>
@@ -63,17 +63,17 @@ export default function Footer() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={link.label}
-                  className="text-white hover:text-brand-red transition-colors"
+                  aria-label={`${link.label} (opens in new tab)`}
+                  className="text-white hover:text-brand-red transition-colors p-2"
                 >
-                  <link.Icon className="w-5 h-5" />
+                  <link.Icon className="w-5 h-5" aria-hidden="true" />
                 </a>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 flex flex-col items-center gap-2 text-xs text-white/40 md:flex-row md:justify-between">
+        <div className="mt-12 border-t border-white/10 pt-6 flex flex-col items-center gap-2 text-xs text-white/60 md:flex-row md:justify-between">
           <p>
             &copy; 2026{' '}
             <a
@@ -82,7 +82,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Big Machine Records
+              Big Machine Records<span className="sr-only"> (opens in new tab)</span>
             </a>
           </p>
           <div className="flex flex-wrap justify-center gap-4 md:justify-end">
@@ -92,7 +92,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Terms
+              Terms<span className="sr-only"> (opens in new tab)</span>
             </a>
             <a
               href="https://www.bigmachinelabelgroup.com/privacy/"
@@ -100,7 +100,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Privacy
+              Privacy<span className="sr-only"> (opens in new tab)</span>
             </a>
             <a
               href="https://www.bigmachinelabelgroup.com/cookies/"
@@ -108,7 +108,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Cookies
+              Cookies<span className="sr-only"> (opens in new tab)</span>
             </a>
             <a
               href="https://www.bigmachinelabelgroup.com/do-not-sell/"
@@ -116,7 +116,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Do Not Sell My Information
+              Do Not Sell My Information<span className="sr-only"> (opens in new tab)</span>
             </a>
           </div>
         </div>

@@ -52,6 +52,7 @@ export default function ParallaxBanner({
         muted
         loop
         playsInline
+        aria-hidden="true"
         className="absolute left-0 right-0 -top-[5%] w-full h-[130%] object-cover will-change-transform"
       />
     </div>

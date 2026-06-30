@@ -58,6 +58,7 @@ export default function ParallaxSection({
           src={src}
           alt={alt}
           fill
+          sizes="100vw"
           style={{ objectPosition }}
           className={`object-cover ${mobileSrc ? 'hidden md:block' : ''}`}
         />
@@ -66,6 +67,7 @@ export default function ParallaxSection({
             src={mobileSrc}
             alt={alt}
             fill
+            sizes="100vw"
             style={{ objectPosition }}
             className="object-cover md:hidden"
           />

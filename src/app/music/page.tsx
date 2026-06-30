@@ -4,9 +4,26 @@ import { FaSpotify, FaAmazon } from 'react-icons/fa6';
 import { SiApplemusic } from 'react-icons/si';
 
 export const metadata: Metadata = {
-  title: 'Music | Greylan James',
+  title: 'Music',
   description:
-    'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more.',
+    'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+  alternates: { canonical: 'https://greylanjames.com/music' },
+  openGraph: {
+    title: 'Music | Greylan James',
+    description:
+      'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+    url: 'https://greylanjames.com/music',
+    type: 'website',
+    siteName: 'Greylan James',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Music | Greylan James',
+    description:
+      'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+    images: ['/og-image.png'],
+  },
 };
 
 const releases = [
@@ -81,7 +98,21 @@ const releases = [
 
 export default function MusicPage() {
   return (
-    <section className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://greylanjames.com' },
+            { '@type': 'ListItem', position: 2, name: 'Music', item: 'https://greylanjames.com/music' },
+          ],
+        }),
+      }}
+    />
+    <section aria-label="Music releases" className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-7xl">
         <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-black md:text-[96px]">
           Music
@@ -95,6 +126,7 @@ export default function MusicPage() {
                   src={release.cover}
                   alt={`${release.title} cover art`}
                   fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   className="object-cover"
                 />
               </div>
@@ -105,7 +137,7 @@ export default function MusicPage() {
                   rel="noopener noreferrer"
                   className="mt-3 block font-headline text-[20px] uppercase tracking-wide text-brand-black hover:text-brand-red transition-colors"
                 >
-                  {release.title}
+                  {release.title}<span className="sr-only"> (opens in new tab)</span>
                 </a>
               ) : (
                 /* TODO: replace with Small Town smart link when received from label */
@@ -125,31 +157,32 @@ export default function MusicPage() {
             href="https://open.spotify.com/artist/0obiwW8UEpyliJ4xhXqrra"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Spotify"
-            className="text-brand-black hover:text-brand-red transition-colors"
+            aria-label="Spotify (opens in new tab)"
+            className="text-brand-black hover:text-brand-red transition-colors p-2"
           >
-            <FaSpotify className="w-6 h-6" />
+            <FaSpotify className="w-6 h-6" aria-hidden="true" />
           </a>
           <a
             href="https://music.apple.com/us/artist/greylan-james/1607407826"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Apple Music"
-            className="text-brand-black hover:text-brand-red transition-colors"
+            aria-label="Apple Music (opens in new tab)"
+            className="text-brand-black hover:text-brand-red transition-colors p-2"
           >
-            <SiApplemusic className="w-6 h-6" />
+            <SiApplemusic className="w-6 h-6" aria-hidden="true" />
           </a>
           <a
             href="https://music.amazon.com/artists/B004JXBNXW/greylan-james"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Amazon Music"
-            className="text-brand-black hover:text-brand-red transition-colors"
+            aria-label="Amazon Music (opens in new tab)"
+            className="text-brand-black hover:text-brand-red transition-colors p-2"
           >
-            <FaAmazon className="w-6 h-6" />
+            <FaAmazon className="w-6 h-6" aria-hidden="true" />
           </a>
         </div>
       </div>
     </section>
+    </>
   );
 }

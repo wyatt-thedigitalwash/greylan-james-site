@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getUpcomingEvents } from '@/lib/bandsintown';
@@ -5,12 +6,32 @@ import ParallaxVideo from '@/components/ParallaxVideo';
 import ParallaxSection from '@/components/ParallaxSection';
 import EmailCapture from '@/components/EmailCapture';
 
+export const metadata: Metadata = {
+  alternates: { canonical: 'https://greylanjames.com' },
+  openGraph: {
+    title: 'Greylan James | Nashville Country Singer-Songwriter',
+    description:
+      'Official website of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter. New music, tour dates, videos, and more.',
+    url: 'https://greylanjames.com',
+    type: 'website',
+    siteName: 'Greylan James',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Greylan James | Nashville Country Singer-Songwriter',
+    description:
+      'Official website of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter. New music, tour dates, videos, and more.',
+    images: ['/og-image.png'],
+  },
+};
+
 export default async function Home() {
   const events = await getUpcomingEvents();
   return (
     <>
       {/* SECTION 1: HERO */}
-      <section data-bg="hero">
+      <section data-bg="hero" aria-label="New single, Small Town">
         {/* TODO: Replace /music with the Small Town smart link once provided */}
         <Link
           href="/music"
@@ -37,7 +58,7 @@ export default async function Home() {
       </section>
 
       {/* SECTION 2: INDEX */}
-      <section data-bg="dark" className="bg-brand-black px-4 py-0 md:px-12 md:py-32">
+      <section data-bg="dark" aria-label="Site navigation index" className="bg-brand-black px-4 py-0 md:px-12 md:py-32">
         <div className="mx-auto max-w-6xl flex flex-col gap-12 md:flex-row md:items-start md:gap-20">
           <nav className="flex flex-col md:flex-1 md:justify-center md:self-center">
             {[
@@ -93,17 +114,17 @@ export default async function Home() {
                       href={event.eventUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block border border-white px-6 py-1 font-headline text-[22px] uppercase tracking-wide text-white text-center hover:bg-white hover:text-brand-black transition-colors"
+                      className="inline-block border border-white px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-white text-center hover:bg-white hover:text-brand-black transition-colors"
                     >
-                      RSVP
+                      RSVP<span className="sr-only"> (opens in new tab)</span>
                     </a>
                     <a
                       href={event.ticketUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block bg-brand-red px-6 py-1 font-headline text-[22px] uppercase tracking-wide text-white text-center hover:opacity-90 transition-opacity"
+                      className="inline-block bg-brand-red px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-white text-center hover:opacity-90 transition-opacity"
                     >
-                      Buy
+                      Buy<span className="sr-only"> tickets (opens in new tab)</span>
                     </a>
                   </div>
                 </div>
@@ -125,7 +146,7 @@ export default async function Home() {
       </ParallaxSection>
 
       {/* SECTION 4: ABOUT */}
-      <section className="bg-brand-black px-4 py-16 md:px-8 md:py-24">
+      <section aria-label="About Greylan James" className="bg-brand-black px-4 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-7xl">
           <h2 className="font-headline text-[64px] leading-none uppercase tracking-tight text-white md:text-[96px]">
             About

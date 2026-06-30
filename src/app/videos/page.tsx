@@ -1,9 +1,26 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Videos | Greylan James',
+  title: 'Videos',
   description:
-    'Watch music videos, lyric videos, and live performances from Greylan James.',
+    'Watch music videos, lyric videos, and live performances from country artist Greylan James. Official video content from Nashville.',
+  alternates: { canonical: 'https://greylanjames.com/videos' },
+  openGraph: {
+    title: 'Videos | Greylan James',
+    description:
+      'Watch music videos, lyric videos, and live performances from country artist Greylan James. Official video content from Nashville.',
+    url: 'https://greylanjames.com/videos',
+    type: 'website',
+    siteName: 'Greylan James',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Videos | Greylan James',
+    description:
+      'Watch music videos, lyric videos, and live performances from country artist Greylan James. Official video content from Nashville.',
+    images: ['/og-image.png'],
+  },
 };
 
 const videos = [
@@ -51,7 +68,21 @@ const videos = [
 
 export default function VideosPage() {
   return (
-    <section className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://greylanjames.com' },
+            { '@type': 'ListItem', position: 2, name: 'Videos', item: 'https://greylanjames.com/videos' },
+          ],
+        }),
+      }}
+    />
+    <section aria-label="Music videos" className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-7xl">
         <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-black md:text-[96px]">
           Videos
@@ -78,5 +109,6 @@ export default function VideosPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

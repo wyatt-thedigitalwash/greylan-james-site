@@ -2,14 +2,44 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'About | Greylan James',
+  title: 'About',
   description:
-    'The story of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter and celebrated hitmaker.',
+    'The story of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter. ACM Award winner and celebrated Nashville hitmaker.',
+  alternates: { canonical: 'https://greylanjames.com/about' },
+  openGraph: {
+    title: 'About | Greylan James',
+    description:
+      'The story of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter. ACM Award winner and celebrated Nashville hitmaker.',
+    url: 'https://greylanjames.com/about',
+    type: 'website',
+    siteName: 'Greylan James',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About | Greylan James',
+    description:
+      'The story of Greylan James, Knoxville-raised, Nashville-based country singer-songwriter. ACM Award winner and celebrated Nashville hitmaker.',
+    images: ['/og-image.png'],
+  },
 };
 
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://greylanjames.com' },
+              { '@type': 'ListItem', position: 2, name: 'About', item: 'https://greylanjames.com/about' },
+            ],
+          }),
+        }}
+      />
       {/* Mobile: stacked image then content */}
       <section className="relative overflow-hidden md:hidden">
         <Image
@@ -61,6 +91,7 @@ export default function AboutPage() {
             alt="Greylan James"
             fill
             priority
+            sizes="50vw"
             className="object-cover object-top"
           />
         </div>
