@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getUpcomingEvents } from '@/lib/bandsintown';
-import ParallaxBanner from '@/components/ParallaxBanner';
+import Texture from '@/components/Texture';
 
 export const metadata: Metadata = {
   title: 'Tour',
@@ -43,10 +43,12 @@ export default async function TourPage() {
         }),
       }}
     />
-    <ParallaxBanner src="https://res.cloudinary.com/dgbiatexy/video/upload/v1781882696/TxQenAtI2UU5_briwls.mp4" height="h-[350px] md:h-[500px]" />
-    <section aria-label="Tour dates" className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-black md:text-[96px]">
+    {/* Extra bottom padding covers what the footer's tear takes. See the
+        spacing note in globals.css. */}
+    <section aria-label="Tour dates" className="relative bg-brand-cream px-4 pt-16 pb-20 md:px-8 md:pt-24 md:pb-[120px]">
+      <Texture variant="paper-light" vignette={false} />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-brown md:text-[96px]">
           Tour
         </h1>
 
@@ -55,20 +57,25 @@ export default async function TourPage() {
             {events.map((event, i) => (
               <div
                 key={`${event.date}-${event.venue}`}
-                className={`flex flex-col gap-3 py-6 md:flex-row md:items-center md:justify-between${i < events.length - 1 ? ' border-b border-brand-black/15' : ''}`}
+                className={`flex flex-col gap-3 py-6 md:flex-row md:items-center md:justify-between${i < events.length - 1 ? ' border-b border-brand-brown/15' : ''}`}
               >
-                <span className="font-headline text-[28px] uppercase tracking-wide text-brand-black md:text-[32px] md:w-64 md:shrink-0">
+                <span className="font-headline text-[28px] uppercase tracking-wide text-brand-brown md:text-[32px] md:w-64 md:shrink-0">
                   {event.date}
                 </span>
-                <span className="font-body text-lg text-brand-black/70 md:flex-1">
-                  {event.venue} &middot; {event.city}
+                {/* Acumin is condensed, so it needs more size than a normal
+                    body face to hold its own next to the date. The venue is
+                    what a fan scans for, so it carries full strength and the
+                    city sits back a step. */}
+                <span className="font-body text-[20px] leading-snug text-brand-brown md:flex-1 md:text-[22px]">
+                  {event.venue}{' '}
+                  <span className="text-brand-brown/60">&middot; {event.city}</span>
                 </span>
                 <div className="flex gap-3 mt-2 md:mt-0">
                   <a
                     href={event.eventUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block border border-brand-black px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-brand-black text-center hover:bg-brand-black hover:text-white transition-colors"
+                    className="inline-block border border-brand-brown px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-brand-brown text-center hover:bg-brand-brown hover:text-brand-cream transition-colors"
                   >
                     RSVP<span className="sr-only"> (opens in new tab)</span>
                   </a>
@@ -76,7 +83,7 @@ export default async function TourPage() {
                     href={event.ticketUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block bg-brand-red px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-white text-center hover:opacity-90 transition-opacity"
+                    className="inline-block bg-brand-brown px-6 py-2 font-headline text-[22px] uppercase tracking-wide text-brand-cream text-center hover:opacity-90 transition-opacity"
                   >
                     Buy<span className="sr-only"> tickets (opens in new tab)</span>
                   </a>
@@ -85,7 +92,7 @@ export default async function TourPage() {
             ))}
           </div>
         ) : (
-          <p className="mt-6 text-lg text-brand-black/70 font-body">
+          <p className="mt-6 text-lg text-brand-brown/70 font-body">
             No upcoming dates right now. Check back soon.
           </p>
         )}

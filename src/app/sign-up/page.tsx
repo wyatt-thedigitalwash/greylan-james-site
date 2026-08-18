@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import SignUpForm from './SignUpForm';
+import Texture from '@/components/Texture';
 
 export const metadata: Metadata = {
   title: 'Sign Up',
@@ -40,12 +41,15 @@ export default function SignUpPage() {
         }),
       }}
     />
-    <section className="bg-brand-black px-4 py-16 md:px-8 md:py-24">
-      <div className="mx-auto max-w-2xl text-center">
-        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-white md:text-[96px]">
+    {/* Extra bottom padding covers what the footer's tear takes. See the
+        spacing note in globals.css. */}
+    <section data-bg="light" className="relative bg-brand-cream px-4 pt-16 pb-20 md:px-8 md:pt-24 md:pb-[120px]">
+      <Texture variant="paper-light" vignette={false} />
+      <div className="relative z-10 mx-auto max-w-2xl text-center">
+        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-brown md:text-[96px]">
           Sign Up
         </h1>
-        <p className="mt-4 text-lg text-white/80 font-body">
+        <p className="mt-4 text-lg text-brand-brown/80 font-body">
           Be the first to know about new music, tour dates, and more.
         </p>
 

@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CookieConsent from "@/components/consent/CookieConsent";
+import PageViewTracker from "@/components/consent/PageViewTracker";
+import TermsGate from "@/components/consent/TermsGate";
+import AnchorScroll from "@/components/shared/AnchorScroll";
 import "./globals.css";
 
 const knockout = localFont({
@@ -46,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#16140D",
+  themeColor: "#2E2422",
 };
 
 export default function RootLayout({
@@ -69,7 +73,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:bg-brand-red focus:px-6 focus:py-3 focus:text-white focus:font-headline focus:text-[20px] focus:uppercase focus:tracking-wide"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:bg-brand-cream focus:px-6 focus:py-3 focus:text-brand-brown focus:font-headline focus:text-[20px] focus:uppercase focus:tracking-wide"
         >
           Skip to main content
         </a>
@@ -97,9 +101,19 @@ export default function RootLayout({
             }),
           }}
         />
+        <AnchorScroll />
         <Header />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
+        {/* Cookie consent banner. Shows once per new visitor, persisted in
+            localStorage; injects nothing before consent is granted. */}
+        <CookieConsent />
+        {/* Reports a page view to the tag container on each client-side route
+            change. No-op until the visitor consents to analytics. */}
+        <PageViewTracker />
+        {/* Arbitration / class-action notice, shown once right after the cookie
+            decision so it is never buried only in the footer. */}
+        <TermsGate />
       </body>
     </html>
   );

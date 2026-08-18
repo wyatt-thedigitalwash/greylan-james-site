@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { FaSpotify, FaAmazon } from 'react-icons/fa6';
 import { SiApplemusic } from 'react-icons/si';
+import { releases } from '@/lib/releases';
+import Texture from '@/components/Texture';
 
 export const metadata: Metadata = {
   title: 'Music',
@@ -26,76 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-const releases = [
-  {
-    title: 'Small Town',
-    cover: '/covers/GreylanJames_SmallTown_Cover.jpg',
-    // TODO: replace with Small Town smart link when received from label
-    link: null,
-  },
-  {
-    title: 'Hold It Down (the after demo)',
-    cover: '/covers/GreylanJames_HoldItDown_Cover.jpg',
-    link: 'https://greylanjames.ffm.to/holditdown.OWE',
-  },
-  {
-    title: "Pullin' From A Bottle",
-    cover: '/covers/GreylanJames_PullinFromABottle_Cover.jpg',
-    link: 'https://greylanjames.ffm.to/pullinfromabottle.O',
-  },
-  {
-    title: 'Give Me A Second (the before)',
-    cover: '/covers/GreylanJames_GiveMeASecond_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/GiveMeASecondWE',
-  },
-  {
-    title: 'Water At A Wedding',
-    cover: '/covers/GreylanJames_WaterAtAWedding_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/WaterAtAWeddingWE',
-  },
-  {
-    title: 'Water At A Wedding - Acoustic Version',
-    cover: '/covers/GreylanJames_WaterAtAWeddingAcoustic_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/WaterAtAWeddingAcousticWE',
-  },
-  {
-    title: 'Wait Til You Have Kids',
-    cover: '/covers/GreylanJames_WaitTilYouHaveKids_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/WaitTilYouHaveKidsWE',
-  },
-  {
-    title: "Things That I Can't Change",
-    cover: '/covers/GreylanJames_ThingsICantChange_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/ThingsThatICantChangeWE',
-  },
-  {
-    title: 'Man Up',
-    cover: '/covers/GreylanJames_ManUp_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/ManUpWE',
-  },
-  {
-    title: 'Who Broke Up With You',
-    cover: '/covers/GreylanJames_WhoBrokeUpWithYou_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/WhoBrokeUpWithYouWE',
-  },
-  {
-    title: "Ain't Thinkin' Bout You",
-    cover: '/covers/GreylanJames_AintThinkinBoutYou_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/AintThinkinBoutYouWE',
-  },
-  {
-    title: 'Young Man',
-    cover: '/covers/GreylanJames_YoungMan_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/YoungManWE',
-  },
-  {
-    // TODO: add Undermine cover art when received from label.
-    title: 'Undermine',
-    cover: '/covers/GreylanJames_Undermine_Cover.jpg',
-    link: 'https://greylanjames.lnk.to/Undermine_WE',
-  },
-];
-
 export default function MusicPage() {
   return (
     <>
@@ -112,44 +44,60 @@ export default function MusicPage() {
         }),
       }}
     />
-    <section aria-label="Music releases" className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-black md:text-[96px]">
+    {/* Extra bottom padding covers what the footer's tear takes. See the
+        spacing note in globals.css. */}
+    <section aria-label="Music releases" className="relative bg-brand-cream px-4 pt-16 pb-20 md:px-8 md:pt-24 md:pb-[120px]">
+      <Texture variant="paper-light" vignette={false} />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-brown md:text-[96px]">
           Music
         </h1>
 
         <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {releases.map((release) => (
-            <div key={release.title}>
+          {releases.map((release) => {
+            /* Cover art and title live inside one link so the whole card is a
+               single tap target, and one focus stop instead of two. */
+            const cover = (
               <div className="relative aspect-square w-full overflow-hidden">
                 <Image
                   src={release.cover}
                   alt={`${release.title} cover art`}
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              {release.link ? (
-                <a
-                  href={release.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 block font-headline text-[20px] uppercase tracking-wide text-brand-black hover:text-brand-red transition-colors"
-                >
-                  {release.title}<span className="sr-only"> (opens in new tab)</span>
-                </a>
-              ) : (
-                /* TODO: replace with Small Town smart link when received from label */
-                <span className="mt-3 block font-headline text-[20px] uppercase tracking-wide text-brand-black">
-                  {release.title}
-                </span>
-              )}
-            </div>
-          ))}
+            );
+
+            return (
+              <div key={release.title}>
+                {release.link ? (
+                  <a
+                    href={release.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-brown"
+                  >
+                    {cover}
+                    <span className="mt-3 block font-headline text-[20px] uppercase tracking-wide text-brand-brown transition-colors group-hover:text-brand-brown/70">
+                      {release.title}<span className="sr-only"> (opens in new tab)</span>
+                    </span>
+                  </a>
+                ) : (
+                  /* No smart link supplied for this release yet. */
+                  <>
+                    {cover}
+                    <span className="mt-3 block font-headline text-[20px] uppercase tracking-wide text-brand-brown">
+                      {release.title}
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <p className="mt-16 text-lg text-brand-black/70 font-body">
+        <p className="mt-16 text-lg text-brand-brown/70 font-body">
           Available everywhere you listen.
         </p>
         <div className="mt-4 flex items-center gap-6">
@@ -158,7 +106,7 @@ export default function MusicPage() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Spotify (opens in new tab)"
-            className="text-brand-black hover:text-brand-red transition-colors p-2"
+            className="text-brand-brown hover:text-brand-brown/70 transition-colors p-2"
           >
             <FaSpotify className="w-6 h-6" aria-hidden="true" />
           </a>
@@ -167,7 +115,7 @@ export default function MusicPage() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Apple Music (opens in new tab)"
-            className="text-brand-black hover:text-brand-red transition-colors p-2"
+            className="text-brand-brown hover:text-brand-brown/70 transition-colors p-2"
           >
             <SiApplemusic className="w-6 h-6" aria-hidden="true" />
           </a>
@@ -176,7 +124,7 @@ export default function MusicPage() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Amazon Music (opens in new tab)"
-            className="text-brand-black hover:text-brand-red transition-colors p-2"
+            className="text-brand-brown hover:text-brand-brown/70 transition-colors p-2"
           >
             <FaAmazon className="w-6 h-6" aria-hidden="true" />
           </a>

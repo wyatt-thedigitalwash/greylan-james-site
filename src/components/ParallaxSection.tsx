@@ -9,7 +9,7 @@ export default function ParallaxSection({
   alt,
   children,
   className = '',
-  overlay = 'bg-black/15',
+  overlay = 'bg-brand-brown/15',
   objectPosition = 'center',
 }: {
   src: string;
@@ -52,7 +52,7 @@ export default function ParallaxSection({
   }, []);
 
   return (
-    <div ref={containerRef} className={`relative overflow-hidden bg-brand-black ${className}`}>
+    <div ref={containerRef} className={`relative overflow-hidden bg-brand-brown ${className}`}>
       <div ref={imgRef} className="absolute left-0 right-0 -top-[15%] h-[130%] will-change-transform">
         <Image
           src={src}

@@ -3,7 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { FaInstagram, FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from 'react-icons/fa6';
+
+// Header bar height, h-16. The header is fixed so it can sit over the home hero,
+// so every other page gets a spacer of the same height to stand in for it.
+const HEADER_HEIGHT = 64;
+
+// Scroll distance over which the oversized hero logo settles to its resting size.
+const LOGO_SHRINK_DISTANCE = 260;
 
 const navLinks = [
   { href: '/music', label: 'Music' },
@@ -22,8 +30,17 @@ const socialLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+  // Only the home page has a hero for the header to sit over. Everywhere else
+  // the header is solid from the start and the logo stays at its resting size.
+  const isHome = pathname === '/';
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  // Both only ever track the home page's scroll; other pages derive their values
+  // below rather than storing them.
+  const [solid, setSolid] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(1);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
 
@@ -42,6 +59,49 @@ export default function Header() {
     }, 400);
     return () => clearTimeout(timeout);
   }, []);
+
+  // Home page only: the header stays transparent over the hero and picks up its
+  // background once the hero has scrolled past, while the logo shrinks from its
+  // oversized state down to the resting size over the first stretch of scroll.
+  useEffect(() => {
+    if (!isHome) return;
+
+    let frame = 0;
+    let heroScrollDepth = 0;
+
+    function measure() {
+      const hero = document.querySelector('[data-bg="hero"]');
+      heroScrollDepth = hero ? hero.getBoundingClientRect().height - HEADER_HEIGHT : 0;
+    }
+
+    function update() {
+      frame = 0;
+      const y = window.scrollY;
+      setSolid(y >= heroScrollDepth);
+      setLogoProgress(1 - Math.min(y / LOGO_SHRINK_DISTANCE, 1));
+    }
+
+    function onScroll() {
+      if (!frame) frame = requestAnimationFrame(update);
+    }
+
+    function onResize() {
+      measure();
+      onScroll();
+    }
+
+    // Sync through onScroll rather than calling update() outright so the first
+    // read lands in a frame callback instead of synchronously in the effect.
+    measure();
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [isHome]);
 
   useEffect(() => {
     if (menuOpen) {
@@ -96,17 +156,35 @@ export default function Header() {
     return () => document.removeEventListener('keydown', trapFocus);
   }, [menuOpen, menuVisible]);
 
+  // Pages without a hero are solid from the start. The open mobile menu is a
+  // solid panel too, so the header above it goes solid and the logo drops to its
+  // resting size rather than spilling over the menu.
+  const showSolid = !isHome || solid || menuOpen;
+  const scaleProgress = isHome && !menuOpen ? logoProgress : 0;
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-brand-black">
-      <div className="relative z-50 flex h-16 items-center justify-between px-4 md:px-12 bg-brand-black">
-        <Link href="/" className="shrink-0" aria-label="Greylan James, home">
+    <>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-colors duration-300 ${
+        showSolid ? 'bg-brand-brown' : 'bg-transparent'
+      }`}
+    >
+      <div className="relative z-50 flex h-16 items-center justify-end px-4 md:px-12">
+        {/* Absolutely positioned and scaled with a transform so growing the logo
+            never moves the nav items. */}
+        <Link
+          href="/"
+          className="site-logo absolute left-4 top-2 md:left-12"
+          aria-label="Greylan James, home"
+          style={{ '--logo-progress': scaleProgress } as React.CSSProperties}
+        >
           <Image
-            src="/logos/GreylanJames_Logo_White.png"
+            src="/logos/GreylanJames_LogoColored.png"
             alt="Greylan James"
-            width={180}
-            height={32}
+            width={1104}
+            height={566}
             priority
-            className="h-8 w-auto"
+            className="h-12 w-auto"
           />
         </Link>
 
@@ -115,7 +193,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-headline text-[24px] uppercase tracking-wide text-white hover:text-brand-red transition-colors"
+              className="font-headline text-[24px] uppercase tracking-wide text-brand-cream hover:text-brand-cream/70 transition-colors"
             >
               {link.label}
             </Link>
@@ -129,7 +207,7 @@ export default function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${label} (opens in new tab)`}
-                className="text-white/70 hover:text-white transition-colors"
+                className="text-brand-cream/70 hover:text-brand-cream transition-colors"
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
               </a>
@@ -142,14 +220,14 @@ export default function Header() {
           ref={hamburgerRef}
           type="button"
           onClick={() => (menuOpen ? closeMenu() : openMenu())}
-          className="md:hidden relative flex flex-col justify-center items-center w-11 h-11 p-2 text-white"
+          className="md:hidden relative flex flex-col justify-center items-center w-11 h-11 p-2 text-brand-cream"
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
         >
           <span
             aria-hidden="true"
-            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            className="block h-0.5 w-6 bg-brand-cream rounded-full transition-all duration-300 ease-in-out absolute"
             style={{
               transform: menuVisible
                 ? 'rotate(45deg) translateY(0)'
@@ -158,7 +236,7 @@ export default function Header() {
           />
           <span
             aria-hidden="true"
-            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            className="block h-0.5 w-6 bg-brand-cream rounded-full transition-all duration-300 ease-in-out absolute"
             style={{
               opacity: menuVisible ? 0 : 1,
               transform: menuVisible ? 'scaleX(0)' : 'scaleX(1)',
@@ -166,7 +244,7 @@ export default function Header() {
           />
           <span
             aria-hidden="true"
-            className="block h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-in-out absolute"
+            className="block h-0.5 w-6 bg-brand-cream rounded-full transition-all duration-300 ease-in-out absolute"
             style={{
               transform: menuVisible
                 ? 'rotate(-45deg) translateY(0)'
@@ -183,7 +261,7 @@ export default function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
-          className="fixed inset-0 top-16 z-40 flex flex-col bg-brand-black transition-opacity duration-400 ease-in-out"
+          className="fixed inset-0 top-16 z-40 flex flex-col bg-brand-brown transition-opacity duration-400 ease-in-out"
           style={{ opacity: menuVisible ? 1 : 0 }}
         >
           <nav aria-label="Mobile navigation" className="flex flex-1 flex-col items-center justify-center gap-8">
@@ -192,7 +270,7 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
-                className="font-headline text-4xl uppercase tracking-wide text-white hover:text-brand-red transition-colors duration-300"
+                className="font-headline text-4xl uppercase tracking-wide text-brand-cream hover:text-brand-cream/70 transition-colors duration-300"
                 style={{
                   opacity: menuVisible ? 1 : 0,
                   transform: menuVisible ? 'translateY(0)' : 'translateY(12px)',
@@ -219,7 +297,7 @@ export default function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${link.label} (opens in new tab)`}
-                className="text-white hover:text-brand-red transition-colors p-2"
+                className="text-brand-cream hover:text-brand-cream/70 transition-colors p-2"
               >
                 <link.Icon className="w-5 h-5" aria-hidden="true" />
               </a>
@@ -228,5 +306,8 @@ export default function Header() {
         </div>
       )}
     </header>
+    {/* Stands in for the fixed header on pages that have no hero to sit over. */}
+    {!isHome && <div aria-hidden="true" className="h-16 shrink-0" />}
+    </>
   );
 }

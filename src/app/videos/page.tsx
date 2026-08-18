@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { videos } from '@/lib/videos';
+import Texture from '@/components/Texture';
+import VideoTheater from '@/components/VideoTheater';
 
 export const metadata: Metadata = {
   title: 'Videos',
@@ -23,49 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-const videos = [
-  {
-    title: 'Hold It Down (the after demo) (Lyric Video)',
-    id: 'hLbG7hL4hME',
-  },
-  {
-    title: "Pullin' From A Bottle (Lyric Video)",
-    id: 'bnRr2Z2u3C8',
-  },
-  {
-    title: 'Give Me A Second (the before) (Lyric Video)',
-    id: 'pIOmS5fwZGw',
-  },
-  {
-    title: 'Water At A Wedding (Lyric Video)',
-    id: 'gSI2nt5OdxQ',
-  },
-  {
-    title: 'Wait Til You Have Kids (Home Video Version)',
-    id: 'J7apgDRFttc',
-  },
-  {
-    title: 'Wait Til You Have Kids (Lyric Video)',
-    id: 'iXUMhoDTTyA',
-  },
-  {
-    title: "Things That I Can't Change (From The Road) ft. Cole Swindell",
-    id: 't7G-hA-exCg',
-  },
-  {
-    title: 'Man Up (From Her Side of Town)',
-    id: 'jsw3fygbHoI',
-  },
-  {
-    title: 'Man Up (Lyric Video)',
-    id: 'J1tkgkpEsXg',
-  },
-  {
-    title: 'Who Broke Up With You',
-    id: '5mPdWOvFgJ4',
-  },
-];
-
 export default function VideosPage() {
   return (
     <>
@@ -82,31 +42,16 @@ export default function VideosPage() {
         }),
       }}
     />
-    <section aria-label="Music videos" className="bg-brand-gray px-4 py-16 md:px-8 md:py-24">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-black md:text-[96px]">
+    {/* Extra bottom padding covers what the footer's tear takes. See the
+        spacing note in globals.css. */}
+    <section aria-label="Music videos" className="relative bg-brand-cream px-4 pt-16 pb-20 md:px-8 md:pt-24 md:pb-[120px]">
+      <Texture variant="paper-light" vignette={false} />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <h1 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-brown md:text-[96px]">
           Videos
         </h1>
 
-        <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-          {videos.map((video) => (
-            <div key={video.id}>
-              <div className="relative w-full aspect-video overflow-hidden">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${video.id}`}
-                  title={video.title}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full border-0"
-                />
-              </div>
-              <p className="mt-3 font-headline text-[18px] uppercase tracking-wide text-brand-black">
-                {video.title}
-              </p>
-            </div>
-          ))}
-        </div>
+        <VideoTheater videos={videos} tone="light" />
       </div>
     </section>
     </>

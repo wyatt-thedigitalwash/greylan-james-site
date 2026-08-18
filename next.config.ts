@@ -9,6 +9,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    // YouTube still frames, used as the video grid's thumbnails so no player
+    // loads until a visitor opens one.
+    remotePatterns: [{ protocol: 'https', hostname: 'i.ytimg.com', pathname: '/vi/**' }],
+  },
+
   async redirects() {
     return [
       // Trailing-slash redirects (WordPress used trailing slashes)

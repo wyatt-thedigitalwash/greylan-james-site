@@ -1,81 +1,107 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { COUNTRIES } from '@/lib/countries';
+import { SMS_COUNTRIES } from '@/lib/subscribe-validation';
+import Texture from '@/components/Texture';
+
+type FormStatus = 'idle' | 'loading' | 'success' | 'error';
+type ErrorField = 'email' | 'phone' | '';
+
+const DEFAULT_SUCCESS =
+  "You're on the list. Check your phone for a text and reply to confirm SMS updates.";
+
+// Keep only digits and auto-format a US number as NXX-NXX-XXXX as the fan types.
+function formatUsPhone(value: string): string {
+  let d = value.replace(/\D/g, '');
+  if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+  d = d.slice(0, 10);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+}
 
 export default function EmailCapture() {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'already' | 'error'>('idle');
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [country, setCountry] = useState('United States');
+  const [website, setWebsite] = useState(''); // honeypot
+  const [status, setStatus] = useState<FormStatus>('idle');
+  const [errorField, setErrorField] = useState<ErrorField>('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+
+  const isNorthAmerica = SMS_COUNTRIES.has(country);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
-
-    const firstName = (data.get('firstName') as string).trim();
-    const lastName = (data.get('lastName') as string).trim();
-    const email = (data.get('email') as string).trim();
-    const zipCode = (data.get('zip') as string).trim();
-    const phone = (data.get('phone') as string).trim();
-    const country = (data.get('country') as string).trim();
-    const website = ((data.get('website') as string) || '').trim();
-
-    // Client-side validation
-    const fieldErrors: Record<string, boolean> = {};
-    if (!firstName) fieldErrors.firstName = true;
-    if (!lastName) fieldErrors.lastName = true;
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fieldErrors.email = true;
-
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors);
-      return;
-    }
-
-    setErrors({});
+    if (status === 'loading') return;
     setStatus('loading');
+    setErrorField('');
+    setErrorMessage('');
 
     try {
-      const res = await fetch('/api/sign-up', {
+      const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, firstName, lastName, zipCode, phone, country, website }),
+        body: JSON.stringify({ firstName, lastName, email, phone, zipCode, country, website }),
       });
+      const data = await res.json().catch(() => null);
 
       if (res.ok) {
+        setSuccessMessage(data?.message || DEFAULT_SUCCESS);
         setStatus('success');
-      } else if (res.status === 409) {
-        setStatus('already');
-      } else {
-        setStatus('error');
+        return;
       }
+
+      const field: ErrorField =
+        data?.field === 'email' || data?.field === 'phone' ? data.field : '';
+      setErrorField(field);
+      setErrorMessage(data?.error || 'Something went wrong. Please try again.');
+      setStatus('error');
+      requestAnimationFrame(() => {
+        if (field === 'email') emailRef.current?.focus();
+        else if (field === 'phone') phoneRef.current?.focus();
+      });
     } catch {
+      setErrorMessage('Something went wrong. Please try again.');
       setStatus('error');
     }
   }
 
-  const isSubmitted = status === 'success' || status === 'already';
-
   const inputClass =
-    'w-full border border-white bg-brand-black px-4 py-3 text-white placeholder-white/50 font-body text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-brand-black';
+    'w-full bg-brand-cream px-4 py-3 text-brand-brown placeholder-brand-brown/50 font-body text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-brown focus-visible:ring-offset-2 focus-visible:ring-offset-brand-cream';
+  /* Two color palette, so an errored field is flagged with a heavier, darker
+     brown border instead of a second hue. */
+  const fieldClass = (field?: ErrorField) =>
+    `${inputClass} ${field && errorField === field ? 'border-2 border-brand-brown' : 'border border-brand-brown/50'}`;
 
   return (
-    <section aria-label="Email signup" className="bg-brand-black border-t border-brand-red px-4 py-16 md:px-8 md:py-20">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="font-headline text-[48px] leading-none uppercase tracking-tight text-white md:text-[64px]">
+    // Torn on both sides: the section above tears down over the top of this one
+    // and the footer tears up over its bottom, so both ends are padded out. See
+    // the spacing note in globals.css.
+    <section aria-label="Email signup" data-bg="light" className="relative bg-brand-cream px-4 pt-[84px] pb-20 md:px-8 md:pt-[112px] md:pb-[104px]">
+      <Texture variant="paper-light" vignette={false} />
+      <div className="relative z-10 mx-auto max-w-2xl text-center">
+        <h2 className="font-headline text-[48px] leading-none uppercase tracking-tight text-brand-brown md:text-[64px]">
           Join the List
         </h2>
-        <p className="mt-4 text-lg text-white/80 font-body">
+        <p className="mt-4 text-lg text-brand-brown/80 font-body">
           Be the first to know about new music, tour dates, and more.
         </p>
 
-        {isSubmitted ? (
+        {status === 'success' ? (
           <div role="status" aria-live="polite" className="mt-8">
-            <p className="text-lg text-white font-body">
-              {status === 'success' ? 'You are on the list.' : 'You are already subscribed.'}
-            </p>
+            <p className="text-lg text-brand-brown font-body">{successMessage || DEFAULT_SUCCESS}</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} noValidate className="mt-8">
+          <form onSubmit={handleSubmit} noValidate className="mt-8 text-left">
             {/* Honeypot field — hidden from humans, traps bots */}
             <div className="absolute -left-[9999px]" aria-hidden="true">
               <label htmlFor="ec-website">Website</label>
@@ -85,90 +111,60 @@ export default function EmailCapture() {
                 name="website"
                 tabIndex={-1}
                 autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
               />
             </div>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
                 <label htmlFor="ec-firstName" className="sr-only">First name</label>
-                <input
-                  type="text"
-                  id="ec-firstName"
-                  name="firstName"
-                  placeholder="First name"
-                  required
-                  aria-required="true"
-                  aria-invalid={errors.firstName ? 'true' : undefined}
-                  aria-describedby={errors.firstName ? 'ec-firstName-error' : undefined}
-                  className={inputClass}
-                />
-                {errors.firstName && (
-                  <p id="ec-firstName-error" role="alert" className="mt-1 text-sm text-[#EF4444] font-body">Required</p>
-                )}
+                <input type="text" id="ec-firstName" name="firstName" placeholder="First name"
+                  autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)}
+                  className={fieldClass()} />
               </div>
               <div>
                 <label htmlFor="ec-lastName" className="sr-only">Last name</label>
-                <input
-                  type="text"
-                  id="ec-lastName"
-                  name="lastName"
-                  placeholder="Last name"
-                  required
-                  aria-required="true"
-                  aria-invalid={errors.lastName ? 'true' : undefined}
-                  aria-describedby={errors.lastName ? 'ec-lastName-error' : undefined}
-                  className={inputClass}
-                />
-                {errors.lastName && (
-                  <p id="ec-lastName-error" role="alert" className="mt-1 text-sm text-[#EF4444] font-body">Required</p>
-                )}
+                <input type="text" id="ec-lastName" name="lastName" placeholder="Last name"
+                  autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)}
+                  className={fieldClass()} />
               </div>
               <div>
                 <label htmlFor="ec-email" className="sr-only">Email address</label>
-                <input
-                  type="email"
-                  id="ec-email"
-                  name="email"
-                  placeholder="Email address"
-                  required
-                  aria-required="true"
-                  aria-invalid={errors.email ? 'true' : undefined}
-                  aria-describedby={errors.email ? 'ec-email-error' : undefined}
-                  className={inputClass}
-                />
-                {errors.email && (
-                  <p id="ec-email-error" role="alert" className="mt-1 text-sm text-[#EF4444] font-body">Required</p>
-                )}
+                <input ref={emailRef} type="email" id="ec-email" name="email" placeholder="Email address *"
+                  required aria-required="true" aria-invalid={errorField === 'email'}
+                  aria-describedby={status === 'error' ? 'ec-error' : undefined}
+                  autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  className={fieldClass('email')} />
               </div>
               <div>
                 <label htmlFor="ec-phone" className="sr-only">Phone number</label>
-                <input
-                  type="tel"
-                  id="ec-phone"
-                  name="phone"
-                  placeholder="Phone number"
-                  className={inputClass}
-                />
+                {isNorthAmerica ? (
+                  <div className={`flex items-stretch bg-brand-cream ${errorField === 'phone' ? 'border-2 border-brand-brown' : 'border border-brand-brown/50'} focus-within:ring-2 focus-within:ring-brand-brown focus-within:ring-offset-2 focus-within:ring-offset-brand-cream`}>
+                    <span className="flex items-center pl-4 pr-2 text-brand-brown/50 font-body select-none" aria-hidden="true">+1</span>
+                    <input ref={phoneRef} type="tel" id="ec-phone" name="phone" inputMode="numeric"
+                      placeholder="555-555-5555" required aria-required="true" aria-invalid={errorField === 'phone'}
+                      aria-describedby={status === 'error' ? 'ec-error' : undefined}
+                      autoComplete="tel" value={phone} onChange={(e) => setPhone(formatUsPhone(e.target.value))}
+                      className="w-full bg-brand-cream px-0 py-3 pr-4 text-brand-brown placeholder-brand-brown/50 font-body text-base border-0 focus:outline-none" />
+                  </div>
+                ) : (
+                  <input ref={phoneRef} type="tel" id="ec-phone" name="phone" inputMode="tel"
+                    placeholder="Phone number (optional)" aria-invalid={errorField === 'phone'}
+                    autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    className={fieldClass('phone')} />
+                )}
               </div>
               <div>
                 <label htmlFor="ec-zip" className="sr-only">Zip code</label>
-                <input
-                  type="text"
-                  id="ec-zip"
-                  name="zip"
-                  placeholder="Zip code"
-                  className={inputClass}
-                />
+                <input type="text" id="ec-zip" name="zip" inputMode="numeric" placeholder="Zip code"
+                  autoComplete="postal-code" value={zipCode} onChange={(e) => setZipCode(e.target.value)}
+                  className={fieldClass()} />
               </div>
               <div>
                 <label htmlFor="ec-country" className="sr-only">Country</label>
-                <select
-                  id="ec-country"
-                  name="country"
-                  defaultValue=""
-                  className={inputClass + ' appearance-none'}
-                >
-                  <option value="" disabled className="text-white/50">Country</option>
+                <select id="ec-country" name="country" value={country} onChange={(e) => setCountry(e.target.value)}
+                  className={fieldClass() + ' appearance-none'}>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
@@ -177,45 +173,26 @@ export default function EmailCapture() {
             </div>
 
             {status === 'error' && (
-              <p role="alert" className="mt-3 text-sm text-[#EF4444] font-body">Something went wrong. Please try again.</p>
+              <p id="ec-error" role="alert" className="mt-3 text-sm text-brand-brown font-body">
+                {errorMessage || 'Something went wrong. Please try again.'}
+              </p>
             )}
 
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="mt-3 w-full bg-brand-red px-8 py-3 font-headline text-[20px] uppercase tracking-wide text-white hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
+            <button type="submit" disabled={status === 'loading'}
+              className="mt-3 w-full bg-brand-brown px-8 py-3 font-headline text-[20px] uppercase tracking-wide text-brand-cream hover:opacity-90 transition-opacity disabled:opacity-50">
               {status === 'loading' ? 'Submitting...' : 'Sign Up'}
             </button>
 
-            <p className="mt-4 text-xs text-white/50 font-body">
-              By submitting this form, you agree to the Big Machine Records{' '}
-              <a
-                href="https://www.bigmachinelabelgroup.com/privacy/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-white/80"
-              >
-                Privacy Policy
-              </a>
+            <p className="mt-4 text-xs text-brand-brown/60 font-body leading-relaxed">
+              By submitting this form you agree to receive email and recurring automated marketing
+              text messages. We will text you once to confirm your number, reply to opt in. Consent
+              is not a condition of purchase. Message and data rates may apply. See the Big Machine
+              Records{' '}
+              <a href="https://www.bigmachinelabelgroup.com/privacy/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-brown/80">Privacy Policy</a>
               , and Laylo&apos;s{' '}
-              <a
-                href="https://docs.laylo.com/en/articles/6497431-terms-of-service"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-white/80"
-              >
-                Terms
-              </a>
+              <a href="https://docs.laylo.com/en/articles/6497431-terms-of-service" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-brown/80">Terms</a>
               {' '}and{' '}
-              <a
-                href="https://docs.laylo.com/en/articles/6497219-privacy-and-gdpr-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-white/80"
-              >
-                Privacy Policy
-              </a>
+              <a href="https://docs.laylo.com/en/articles/6497219-privacy-and-gdpr-policy" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-brown/80">Privacy Policy</a>
               .
             </p>
           </form>

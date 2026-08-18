@@ -2,11 +2,22 @@
 
 import { useRef, useEffect } from 'react';
 
+/**
+ * A full-bleed video band with a slow parallax drift.
+ *
+ * Always pass a `poster`. A remote video that 404s does not raise a media
+ * error -- Cloudinary answers a dead URL with a zero-byte image/gif, so the
+ * element simply never loads and the container's background shows through as a
+ * silent, full-height void. The poster makes that failure degrade to a still
+ * frame instead.
+ */
 export default function ParallaxBanner({
   src,
+  poster,
   height = 'h-[280px] md:h-[400px]',
 }: {
   src: string;
+  poster?: string;
   height?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,11 +54,12 @@ export default function ParallaxBanner({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden bg-brand-black ${height}`}
+      className={`relative w-full overflow-hidden bg-brand-brown ${height}`}
     >
       <video
         ref={videoRef}
         src={src}
+        poster={poster}
         autoPlay
         muted
         loop
