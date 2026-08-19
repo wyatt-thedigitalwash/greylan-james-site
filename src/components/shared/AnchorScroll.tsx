@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useCurrentPath } from "@/lib/useCurrentPath";
 
 /**
  * Fixes same-page hash navigation for internal links (e.g. the legal pages'
@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
  * offset). This only steps in for full-path internal links on the same route.
  */
 export default function AnchorScroll() {
-  const pathname = usePathname();
+  const pathname = useCurrentPath();
 
   const handleClick = useCallback(
     (e: MouseEvent) => {

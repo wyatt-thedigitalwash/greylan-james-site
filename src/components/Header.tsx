@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 import { FaInstagram, FaFacebookF, FaTiktok, FaXTwitter, FaYoutube } from 'react-icons/fa6';
+import { useCurrentPath } from '@/lib/useCurrentPath';
 
 // Header bar height, h-16. The header is fixed so it can sit over the home hero,
 // so every other page gets a spacer of the same height to stand in for it.
@@ -30,7 +30,7 @@ const socialLinks = [
 ];
 
 export default function Header() {
-  const pathname = usePathname();
+  const pathname = useCurrentPath();
   // Only the home page has a hero for the header to sit over. Everywhere else
   // the header is solid from the start and the logo stays at its resting size.
   const isHome = pathname === '/';
@@ -306,8 +306,10 @@ export default function Header() {
         </div>
       )}
     </header>
-    {/* Stands in for the fixed header on pages that have no hero to sit over. */}
-    {!isHome && <div aria-hidden="true" className="h-16 shrink-0" />}
+    {/* Stands in for the fixed header on pages that have no hero to sit over.
+        Always rendered and collapsed to nothing on the home page, so a route
+        change only swaps a class instead of adding and removing a node. */}
+    <div aria-hidden="true" className={isHome ? 'h-0 shrink-0' : 'h-16 shrink-0'} />
     </>
   );
 }

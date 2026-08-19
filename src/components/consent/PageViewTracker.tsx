@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { useCurrentPath } from "@/lib/useCurrentPath";
 import { readConsent } from "./consent";
 import { grantedCategories, pushConsentSignal } from "@/lib/analytics";
 
@@ -15,7 +15,7 @@ import { grantedCategories, pushConsentSignal } from "@/lib/analytics";
  * a visitor who has decided, and a first-time visitor has not consented yet.
  */
 export default function PageViewTracker() {
-  const pathname = usePathname();
+  const pathname = useCurrentPath();
   const firstRun = useRef(true);
 
   useEffect(() => {
