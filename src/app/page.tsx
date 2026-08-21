@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getUpcomingEvents } from '@/lib/bandsintown';
+import { BIO } from '@/lib/bio';
 import { releases } from '@/lib/releases';
 import { videos } from '@/lib/videos';
 import ParallaxSection from '@/components/ParallaxSection';
@@ -245,9 +246,7 @@ export default async function Home() {
           <h2 className="font-headline text-[64px] leading-none uppercase tracking-tight text-brand-cream md:text-[96px]">
             About
           </h2>
-          <p className="mt-6 text-lg leading-relaxed text-brand-cream/80 font-body">
-            From the moment his Papaw gifted him his first guitar at the age of five, one of Nashville&rsquo;s most exciting young breakout Country stars Greylan James knew he was meant to be a musician. The Knoxville-raised artist-on-the-rise has been manifesting his vision of Country music stardom since his earliest days: from those cleats and cowboy hats he wore to school to playing every sort of live show imaginable from tailgates to patios and dive bars to funerals around his hometown. Since moving to Music City eight years ago, Greylan has become a &ldquo;celebrated songwriter&rdquo; (Country Now) earning cuts from some of Country music&rsquo;s most notable artists including Kenny Chesney, Chris Young, Cole Swindell, Darius Rucker, Chris Janson, Bailey Zimmerman, Breland and more. The singer/songwriter recently earned his first No. 1 and ACM Award for Song Of The Year co-writing Jordan Davis&rsquo; smash hit &ldquo;Next Thing You Know.&rdquo; The song also earned Greylan his first CMA Award nomination for Song Of The Year. To date, Greylan&rsquo;s songbook has amassed more than 650 million streams. And while Greylan has undoubtedly been incredibly successful penning hits for others in the writer&rsquo;s room, he&rsquo;s ready to strike out on his own with the recent release of his anticipated debut single &ldquo;Young Man.&rdquo; Co-written alongside esteemed Nashville songwriters Jacob Davis and Josh Miller, and dedicated to Greylan&rsquo;s late grandfather, the reflective song of notching wisdom from one&rsquo;s elders is his most personal song yet. After joining Old Dominion and Cole Swindell on the road in 2023, Greylan has supported Scotty McCreery&rsquo;s CAB IN A SOLO TOUR and Adam Doleac&rsquo;s WRONG SIDE OF A SUNRISE TOUR in 2024.
-          </p>
+          <p className="mt-6 text-lg leading-relaxed text-brand-cream/80 font-body">{BIO}</p>
           <Link
             href="/about"
             className="mt-8 inline-block bg-brand-cream px-8 py-3 font-headline text-[20px] uppercase tracking-wide text-brand-brown hover:opacity-90 transition-opacity"

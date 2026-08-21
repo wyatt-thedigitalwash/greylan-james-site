@@ -37,7 +37,9 @@ Every tile is drawn in cream and dark brown with a varying alpha, so textures ne
 Headlines are uppercase and condensed. Body is sentence case.
 
 ## Logo
-Logo files are in the public logos directory: GreylanJames_LogoColored.png (cream script wordmark, two lines, with the Tennessee state outline as the dot detail), GreylanJames_LogoInitials.png (cream G monogram with stars), and GreylanJames_LogoWhite.png (pure white wordmark). The header uses the colored wordmark. The footer uses the initials monogram. Both are cream artwork, so they sit on dark brown surfaces only. There is currently no dark brown logo file for use on cream sections. Request one from the client if a logo needs to appear on a light section.
+Logo files are in the public logos directory: GreylanJames_LogoColored.png (cream script wordmark, two lines, with the Tennessee state outline as the dot detail), GreylanJames_LogoInitials.png (cream G monogram with stars), GreylanJames_LogoWhite.png (pure white wordmark), and greyland-james-favicon.png (the G monogram inside a double-ruled circle, on black). The header uses the colored wordmark. The footer uses the initials monogram. Those are cream artwork, so they sit on dark brown surfaces only. There is currently no dark brown logo file for use on cream sections. Request one from the client if a logo needs to appear on a light section.
+
+Everything in public/ that is derived rather than supplied is built by `node scripts/generate-icons.mjs`. The favicon roundel produces favicon.ico, apple-touch-icon.png, and both android-chrome sizes. The OG card is the home hero photo with the colored wordmark composited low, so it clears Greylan's face, over a bottom-weighted scrim that keeps the cream letters legible against his light shirt. Rerun the script after changing either source file; do not hand-edit the generated files.
 
 ## Tone of Voice
 Plainspoken, grounded, country. Short declarative sentences. Confident but not boastful. Warm and human in body copy, punchy and bold in headlines. No corporate or marketing hype words. No clichés. No em dashes anywhere in site copy.
@@ -52,12 +54,18 @@ Hard edges over rounded corners. Square buttons, never pills. Large condensed ty
 ## Key Content
 
 ### Full Bio (About page)
-From the moment his Papaw gifted him his first guitar at the age of five, one of Nashville's most exciting young breakout Country stars Greylan James knew he was meant to be a musician. The Knoxville-raised artist-on-the-rise has been manifesting his vision of Country music stardom since his earliest days: from those cleats and cowboy hats he wore to school to playing every sort of live show imaginable from tailgates to patios and dive bars to funerals around his hometown. Since moving to Music City eight years ago, Greylan has become a "celebrated songwriter" (Country Now) earning cuts from some of Country music's most notable artists including Kenny Chesney, Chris Young, Cole Swindell, Darius Rucker, Chris Janson, Bailey Zimmerman, Breland and more. The singer/songwriter recently earned his first No. 1 and ACM Award for Song Of The Year co-writing Jordan Davis' smash hit "Next Thing You Know." The song also earned Greylan his first CMA Award nomination for Song Of The Year. To date, Greylan's songbook has amassed more than 650 million streams. And while Greylan has undoubtedly been incredibly successful penning hits for others in the writer's room, he's ready to strike out on his own with the recent release of his anticipated debut single "Young Man." Co-written alongside esteemed Nashville songwriters Jacob Davis and Josh Miller, and dedicated to Greylan's late grandfather, the reflective song of notching wisdom from one's elders is his most personal song yet. After joining Old Dominion and Cole Swindell on the road in 2023, Greylan has supported Scotty McCreery's CAB IN A SOLO TOUR and Adam Doleac's WRONG SIDE OF A SUNRISE TOUR in 2024.
+From the moment his Papaw gifted him his first guitar at the age of five, one of Nashville's most exciting young breakout country stars Greylan James knew he was meant to be a musician. The Knoxville-raised artist-on-the-rise has been manifesting his vision of country music stardom since his earliest days: from those cleats and cowboy hats he wore to school to playing every sort of live show imaginable from tailgates to patios and dive bars to funerals around his hometown. Since arriving in Music City, Greylan has become a "celebrated songwriter" (Country Now) earning cuts from some of country music's most notable artists including Kenny Chesney, Morgan Wallen, Cole Swindell, Darius Rucker, Blake Shelton, Bailey Zimmerman, BRELAND and more. The singer-songwriter earned his first ACM Award for Song of the Year, co-writing Jordan Davis' No. 1 smash hit "Next Thing You Know." The song also earned Greylan a BMI Award and his first CMA Award nomination for Song of the Year. To date, Greylan's songbook has landed three No. 1 hits and amassed over 900M streams. And while Greylan has undoubtedly been incredibly successful penning hits for others in the writer's room, he's ready to strike out on his own. His growing catalog of songs, including his buzzy Top 25 single "Water At A Wedding," highlight why SiriusXM dubbed him "a superstar just beginning to hit his stride" with his "impeccable songwriting and artistry." Greylan has toured with artists like Old Dominion, Scotty McCreery and wrapped 2025 on Cole Swindell's Happy Hour Sad Tour.
 
-NOTE: Client-approved final copy, confirmed 18 Aug 2026. Use verbatim. It lives in one place, the About page, and the home About section quotes the same text.
+NOTE: Client-approved final copy, replaced 21 Aug 2026 with the label's current one-sheet bio. Use verbatim. It lives in one place, src/lib/bio.ts, and both the About page and the home About section render that constant.
+
+Two edits against the label's document, neither changing meaning:
+- The en dashes bracketing the "Water At A Wedding" clause became commas, per the no-em-dash rule in CLAUDE.md.
+- The closing "For a full list of tour dates and more, visit GreylanJames.com" is dropped. It is a press-release sign-off and the reader is already on the site.
 
 ### Short Bio (Home About section)
-Knoxville-raised, Nashville-based singer-songwriter Greylan James has written hits for Kenny Chesney, Chris Young, Cole Swindell, Darius Rucker and more, and earned an ACM Award for co-writing Jordan Davis' No. 1 "Next Thing You Know." Now he is stepping out front with his own music.
+Knoxville-raised, Nashville-based singer-songwriter Greylan James has written hits for Kenny Chesney, Morgan Wallen, Cole Swindell, Darius Rucker and more, and earned an ACM Award for co-writing Jordan Davis' No. 1 "Next Thing You Know." Now he is stepping out front with his own music.
+
+NOTE: Not currently used anywhere. The home About section renders the full bio. Kept here in case a shorter cut is wanted later.
 
 ### Streaming and Artist Links
 - Spotify: https://open.spotify.com/artist/0obiwW8UEpyliJ4xhXqrra
@@ -88,7 +96,6 @@ Not ported, they are WordPress plugins bound to UMG's own backend: UMG AAL (part
 
 ## Placeholders Pending from Client
 - Acumin Pro Condensed web font files or Adobe Fonts project, or an approved substitute
-- Updated bio that mentions Small Town and current tours
 - Cover art for "I Hope She Hears These" and "Anything Cold (Shredded Version)"
 
 ## Design Anti-Patterns to Avoid
