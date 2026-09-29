@@ -10,7 +10,7 @@ import {
   readConsent,
   writeConsent,
 } from "./consent";
-import { applyConsent } from "./injectScripts";
+import { applyConsent, revokeConsent } from "./injectScripts";
 
 const NON_NECESSARY: Category[] = ["analytics", "advertising", "functional", "social"];
 
@@ -85,6 +85,7 @@ export default function CookieConsent() {
     setDecided(true);
     window.dispatchEvent(new Event("cookie-consent-decided"));
     if (removed) {
+      if (prev) revokeConsent(prev, consent);
       window.location.reload();
       return;
     }

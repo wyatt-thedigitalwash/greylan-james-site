@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useCurrentPath } from "@/lib/useCurrentPath";
 import { readConsent } from "./consent";
 import { grantedCategories, pushConsentSignal } from "@/lib/analytics";
+import { trackAdPageView } from "@/lib/adPixels";
 
 /**
  * On the old WordPress site every navigation was a full page load, so GA4
@@ -31,7 +32,10 @@ export default function PageViewTracker() {
     if (categories.length === 0) return;
 
     // Wait a tick so the new page's <title> is in place before it is read.
-    const id = window.setTimeout(() => pushConsentSignal(categories), 0);
+    const id = window.setTimeout(() => {
+      pushConsentSignal(categories);
+      if (consent.advertising) trackAdPageView();
+    }, 0);
     return () => window.clearTimeout(id);
   }, [pathname]);
 
