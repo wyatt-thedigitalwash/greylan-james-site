@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getUpcomingEvents } from '@/lib/bandsintown';
 import { BIO } from '@/lib/bio';
-import { releases } from '@/lib/releases';
+import { herSide, herSideCopy, isHerSideOut, releases } from '@/lib/releases';
 import { videos } from '@/lib/videos';
 import ParallaxSection from '@/components/ParallaxSection';
 import EmailCapture from '@/components/EmailCapture';
@@ -43,45 +43,50 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const events = await getUpcomingEvents();
+  const copy = herSideCopy(isHerSideOut());
   return (
     <>
       {/* SECTION 1: HERO */}
-      <section data-bg="hero" aria-label="Greylan James, new single, Small Town" className="relative">
+      <section data-bg="hero" aria-label="Greylan James, new single, Water At A Wedding (her side.) with Gabriella Rose" className="relative">
         <h1 className="sr-only">Greylan James, Nashville country singer-songwriter</h1>
         <div className="relative h-[100svh] min-h-[520px] w-full">
           <Image
-            src="/backgrounds/GreylanJames_HomeHeroAsset.jpg"
-            alt="Greylan James outdoors in a camo ball cap"
+            src="/backgrounds/GreylanJames_WaterAtAWedding_herside.jpg"
+            alt="Greylan James and Gabriella Rose in a candlelit chapel"
             fill
             priority
             sizes="100vw"
-            /* The hero photo is landscape 3:2 (2440x1627). On a portrait phone
-               object-cover scales it to match the viewport height, so the full
-               height is always shown and roughly 70% of the width is cropped.
-               That means the vertical half of object-position is inert here and
-               only the horizontal focal point does anything. 62% cropped into
-               his face; 46% keeps him whole with room on the field side. */
-            className="object-cover object-[46%_center] md:object-center"
+            /* Portrait photo (2:3). On desktop object-cover shows a horizontal
+               band of it, so the vertical focal point sets which band: 38%
+               keeps both faces in frame. On a phone it is shown nearly whole. */
+            className="object-cover object-[50%_center] md:object-[center_38%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/85 via-brand-brown/25 to-brand-brown/10" />
+          {/* Black, not brand brown: brown over this black-and-white photo turns
+              it sepia. The photo is already dark, so only the bottom third
+              gets a light scrim, enough to keep the lockup readable where it
+              crosses his face. */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+          {/* The bottom quarter eases into brand brown so the photo meets the
+              Music section's torn brown edge without a hard cut. Eased (solid
+              only at the very bottom) so it never reads as a sepia band. */}
+          <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-brand-brown via-brand-brown/30 via-40% to-transparent" />
           <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-12 md:px-12 md:pb-20">
-            {/* Kicker and title are set in the same headline face, tight and
-                stacked, so they read as one printed poster lockup rather than a
-                spaced-out eyebrow floating above a heading. */}
             <p className="font-headline text-[20px] leading-none uppercase text-brand-cream/80 md:text-[30px]">
-              New Single, Out Now
+              {copy.kicker}
             </p>
             <p className="font-headline text-[64px] leading-[0.9] uppercase tracking-tight text-brand-cream md:text-[120px]">
-              Small Town
+              Water At A Wedding
             </p>
-            {/* Small Town smart link, same URL as the release in releases.ts */}
+            <p className="mt-2 font-headline text-[20px] leading-none uppercase text-brand-cream/80 md:text-[30px]">
+              Her Side. with Gabriella Rose
+            </p>
             <a
-              href="https://greylanjames.ffm.to/smalltown.OWE"
+              href={herSide.link!}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block w-fit bg-brand-cream px-8 py-3 font-headline text-[20px] uppercase tracking-wide text-brand-brown hover:opacity-90 transition-opacity"
             >
-              Listen Now<span className="sr-only"> (opens in new tab)</span>
+              {copy.cta}<span className="sr-only"> (opens in new tab)</span>
             </a>
           </div>
         </div>

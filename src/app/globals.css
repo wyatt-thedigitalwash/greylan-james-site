@@ -427,3 +427,42 @@ section[data-bg="light"] :focus-visible {
   background: rgba(225, 221, 206, 0.1);
   border-color: var(--brand-cream);
 }
+
+/* ─── Splash / Pre-Home Overlay ───
+   Full-screen "her side." release card shown once per browser session, never
+   on /legal routes. State lives as a class on <html>, set before paint by the
+   inline script in the root layout, so a visitor who already entered never
+   sees it flash. */
+#splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  opacity: 1;
+  transition: opacity 600ms ease;
+}
+#splash-overlay.is-exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+html.splash-entered #splash-overlay,
+html.splash-exempt #splash-overlay {
+  display: none;
+}
+
+/* Lock scroll while the splash is up, but never on exempt (legal) routes. */
+html:not(.splash-entered):not(.splash-exempt) body {
+  overflow: hidden;
+}
+
+/* "her side." smear lockup (SmearText). The ghost layer drifts a couple of
+   pixels side to side; reduced motion leaves the still smear. */
+.smear-ghost {
+  animation: smear-drift 6s ease-in-out 1300ms infinite alternate;
+}
+@keyframes smear-drift {
+  from { transform: translateX(-2px); opacity: 0.8; }
+  to { transform: translateX(2px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smear-ghost { animation: none; }
+}

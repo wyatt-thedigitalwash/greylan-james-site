@@ -8,12 +8,12 @@ import Texture from '@/components/Texture';
 export const metadata: Metadata = {
   title: 'Music',
   description:
-    'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+    'Listen to all releases from Greylan James including Water At A Wedding (her side.) with Gabriella Rose, Small Town, Hold It Down, and more. Available on Spotify, Apple Music, and Amazon.',
   alternates: { canonical: 'https://greylanjames.com/music' },
   openGraph: {
     title: 'Music | Greylan James',
     description:
-      'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+      'Listen to all releases from Greylan James including Water At A Wedding (her side.) with Gabriella Rose, Small Town, Hold It Down, and more. Available on Spotify, Apple Music, and Amazon.',
     url: 'https://greylanjames.com/music',
     type: 'website',
     siteName: 'Greylan James',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Music | Greylan James',
     description:
-      'Listen to all releases from Greylan James including Small Town, Hold It Down, Young Man, and more. Available on Spotify, Apple Music, and Amazon.',
+      'Listen to all releases from Greylan James including Water At A Wedding (her side.) with Gabriella Rose, Small Town, Hold It Down, and more. Available on Spotify, Apple Music, and Amazon.',
     images: ['/og-image.png'],
   },
 };

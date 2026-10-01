@@ -9,7 +9,33 @@ export type Release = {
   link: string | null;
 };
 
+/** The current campaign. Used by the splash, the home hero, and the lists below. */
+export const herSide: Release = {
+  title: 'Water At A Wedding (her side.)',
+  cover: '/covers/GreylanJames_WaterAtAWedding_HerSide_GabriellaRose_Cover.jpg',
+  link: 'https://greylanjames.ffm.to/waterataweddingherside.OWE',
+};
+
+// Midnight Eastern on release day, when the single goes live on US services.
+// The smart link stays the same; it flips from pre-save to listen on its own.
+const HER_SIDE_RELEASE = new Date('2026-10-07T00:00:00-04:00');
+
+// Call this from server components only and pass the result down as a prop. A
+// client component reading the clock itself would disagree with prerendered
+// HTML on either side of release day and trip a hydration mismatch. The root
+// layout revalidates hourly, so every route picks up the flip on its own.
+export function isHerSideOut(): boolean {
+  return Date.now() >= HER_SIDE_RELEASE.getTime();
+}
+
+export function herSideCopy(released: boolean) {
+  return released
+    ? { kicker: 'New Single, Out Now', cta: 'Listen Now', date: 'out now' }
+    : { kicker: 'New Single, Out October 7', cta: 'Pre-Save', date: 'october 7' };
+}
+
 export const releases: Release[] = [
+  herSide,
   {
     title: 'Small Town',
     cover: '/covers/GreylanJames_SmallTown_Cover.jpg',
