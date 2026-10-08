@@ -34,7 +34,9 @@ export async function getUpcomingEvents(
   try {
     const res = await fetch(
       `https://rest.bandsintown.com/artists/id_2410772/events?app_id=${appId}`,
-      { next: { revalidate: 21600 } }
+      // Five minutes, so new Bandsintown dates show up quickly without hitting
+      // the API on every visit.
+      { next: { revalidate: 300 } }
     );
 
     if (!res.ok) return [];
