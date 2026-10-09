@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 import Link from 'next/link';
 import { getUpcomingEvents } from '@/lib/bandsintown';
 import { BIO } from '@/lib/bio';
-import { herSide, herSideCopy, isHerSideOut, releases } from '@/lib/releases';
+import { album, albumCopy, isAlbumOut, releases } from '@/lib/releases';
 import { videos } from '@/lib/videos';
 import ParallaxSection from '@/components/ParallaxSection';
 import EmailCapture from '@/components/EmailCapture';
@@ -41,52 +41,67 @@ export const metadata: Metadata = {
   },
 };
 
+// Shared props for the art-directed hero below.
+const heroImage = { alt: '', fill: true, priority: true, sizes: '100vw' };
+const { props: heroDesktop } = getImageProps({
+  ...heroImage,
+  src: '/backgrounds/GreylanJames_DesktopAlbumPhoto.jpg',
+});
+const { props: heroMobile } = getImageProps({
+  ...heroImage,
+  src: '/backgrounds/GreylanJames_AlbumPhoto.jpg',
+});
+
 export default async function Home() {
   const events = await getUpcomingEvents();
-  const copy = herSideCopy(isHerSideOut());
+  const albumText = albumCopy(isAlbumOut());
   return (
     <>
       {/* SECTION 1: HERO */}
-      <section data-bg="hero" aria-label="Greylan James, new single, Water At A Wedding (her side.) with Gabriella Rose" className="relative">
+      <section data-bg="hero" aria-label="Greylan James, debut album, Greylan James" className="relative">
         <h1 className="sr-only">Greylan James, Nashville country singer-songwriter</h1>
         <div className="relative h-[100svh] min-h-[520px] w-full">
-          <Image
-            src="/backgrounds/GreylanJames_WaterAtAWedding_herside.jpg"
-            alt="Greylan James and Gabriella Rose in a candlelit chapel"
-            fill
-            priority
-            sizes="100vw"
-            /* Portrait photo (2:3). On desktop object-cover shows a horizontal
-               band of it, so the vertical focal point sets which band: 38%
-               keeps both faces in frame. On a phone it is shown nearly whole. */
-            className="object-cover object-[50%_center] md:object-[center_38%]"
-          />
-          {/* Black, not brand brown: brown over this black-and-white photo turns
-              it sepia. The photo is already dark, so only the bottom third
-              gets a light scrim, enough to keep the lockup readable where it
-              crosses his face. */}
+          {/* Art directed: the landscape crop from 768px up, the portrait
+              original on phones. One <picture>, so only the matching file
+              downloads. */}
+          <picture>
+            <source media="(min-width: 768px)" srcSet={heroDesktop.srcSet} sizes="100vw" />
+            <img
+              {...heroMobile}
+              alt="Greylan James with his guitar on a bench beside a bonfire at dusk, a beagle at his feet"
+              /* Portrait (2:3) on phones is shown nearly whole. The desktop
+                 frame is wide (about 2:1), so most screens trim its sides;
+                 on extra-wide ones it trims top and bottom instead, and 30%
+                 keeps his cap clear of the header. */
+              className="absolute inset-0 h-full w-full object-cover object-[50%_center] md:object-[center_30%]"
+            />
+          </picture>
+          {/* Black, not brand brown: the photo is already dark, so only the
+              bottom half gets a scrim, enough to keep the lockup readable
+              where it crosses the bench and the dog. */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
           {/* The bottom quarter eases into brand brown so the photo meets the
-              Music section's torn brown edge without a hard cut. Eased (solid
-              only at the very bottom) so it never reads as a sepia band. */}
+              Music section's torn brown edge without a hard cut. */}
           <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-brand-brown via-brand-brown/30 via-40% to-transparent" />
-          <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-12 md:px-12 md:pb-20">
+          {/* Right-aligned on phones so the lockup clears the dog at bottom
+              left of the portrait photo. Left-aligned from 768px up. */}
+          <div className="relative z-10 flex h-full flex-col items-end justify-end px-4 pb-12 text-right md:items-start md:px-12 md:pb-20 md:text-left">
             <p className="font-headline text-[20px] leading-none uppercase text-brand-cream/80 md:text-[30px]">
-              {copy.kicker}
+              Debut Album
             </p>
             <p className="font-headline text-[64px] leading-[0.9] uppercase tracking-tight text-brand-cream md:text-[120px]">
-              Water At A Wedding
+              {album.title}
             </p>
             <p className="mt-2 font-headline text-[20px] leading-none uppercase text-brand-cream/80 md:text-[30px]">
-              Her Side. with Gabriella Rose
+              {albumText.date}
             </p>
             <a
-              href={herSide.link!}
+              href={album.link}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block w-fit bg-brand-cream px-8 py-3 font-headline text-[20px] uppercase tracking-wide text-brand-brown hover:opacity-90 transition-opacity"
             >
-              {copy.cta}<span className="sr-only"> (opens in new tab)</span>
+              {albumText.cta}<span className="sr-only"> the album Greylan James (opens in new tab)</span>
             </a>
           </div>
         </div>

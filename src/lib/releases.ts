@@ -34,6 +34,26 @@ export function herSideCopy(released: boolean) {
     : { kicker: 'New Single, Out October 7', cta: 'Pre-Save', date: 'october 7' };
 }
 
+/** The debut album. Headlines the home hero. No cover art supplied yet. */
+export const album = {
+  title: 'Greylan James',
+  link: 'https://greylanjames.ffm.to/greylanjames.OWE',
+};
+
+// Midnight Eastern on release day. Same smart link before and after.
+const ALBUM_RELEASE = new Date('2026-11-13T00:00:00-05:00');
+
+// Server components only, for the same hydration reason as isHerSideOut.
+export function isAlbumOut(): boolean {
+  return Date.now() >= ALBUM_RELEASE.getTime();
+}
+
+export function albumCopy(released: boolean) {
+  return released
+    ? { date: 'Out Now', cta: 'Listen Now' }
+    : { date: 'Out November 13', cta: 'Pre-Save' };
+}
+
 export const releases: Release[] = [
   herSide,
   {
