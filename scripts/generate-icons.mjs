@@ -1,11 +1,13 @@
-// Builds every derived brand asset in public/ from the two source files the
-// label supplies. Run with `node scripts/generate-icons.mjs` after either
-// source changes.
+// Builds every derived brand asset in public/ from the source files the label
+// supplies. Run with `node scripts/generate-icons.mjs` after any source
+// changes.
 //
 //   logos/greyland-james-favicon.png  -> favicon.ico, apple-touch-icon,
 //                                        android-chrome-192, android-chrome-512
 //   backgrounds/GreylanJames_HomeHeroAsset.jpg
 //     + logos/GreylanJames_LogoColored.png -> og-image.png
+//   logos/GreylanJames_TennesseeYouAgain_TitleFlat.png
+//                                     -> GreylanJames_TennesseeYouAgain_TitleTrimmed.png
 //
 // This replaces the old set, which drew a "GJ" monogram in Knockout rather than
 // using the real brand marks.
@@ -127,3 +129,13 @@ const ogImage = await sharp(bg)
 
 await writeFile(resolve(pub, 'og-image.png'), ogImage);
 console.log('✓ og-image.png (1200x630)');
+
+/* ------------------------------------------------- Tennessee You Again ---- */
+
+// The label's flat title art ships with transparent padding around the letters.
+// Trimmed so the splash spaces the title by its letters, not by that margin.
+await sharp(resolve(pub, 'logos/GreylanJames_TennesseeYouAgain_TitleFlat.png'))
+  .trim({ threshold: 1 })
+  .png()
+  .toFile(resolve(pub, 'logos/GreylanJames_TennesseeYouAgain_TitleTrimmed.png'));
+console.log('✓ logos/GreylanJames_TennesseeYouAgain_TitleTrimmed.png');

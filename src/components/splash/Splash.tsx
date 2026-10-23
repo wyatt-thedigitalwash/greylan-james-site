@@ -4,31 +4,27 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cormorant, naskh } from "@/lib/herSideFonts";
-import { herSide, herSideCopy } from "@/lib/releases";
-import SmearText from "@/components/herside/SmearText";
+import { freshman, sourceSans } from "@/lib/tennesseeFonts";
+import { tennesseeYouAgain } from "@/lib/releases";
 
-// Shared button frame. Labels are set like the "her side." headline, lowercase
-// Cormorant Garamond, so the buttons read as part of the release artwork.
-const BUTTON =
-  "flex h-12 w-full items-center justify-center pb-[2px] text-[21px] font-bold lowercase leading-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white min-[480px]:w-[200px]";
+// Campaign palette, per the release toolkit: dark green #22241E background,
+// orange #C98155 headline, beige #B6A394 sub-heads and body. The splash is the
+// only place it applies.
 
-// Campaign palette: black background, dark red names, white headline.
-const RED = "#620909";
+// Shared button frame. Labels are set in the campaign's body face, Source Sans
+// 3, in semibold caps, so they read as controls rather than more title art.
+const BUTTON = `${sourceSans.className} flex h-12 w-full items-center justify-center text-[16px] font-semibold uppercase leading-none tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#B6A394] min-[480px]:w-[200px]`;
 
 // Versioned so a new campaign re-shows the splash to everyone automatically.
 // Bump the suffix when the release changes, and keep it in sync with the
 // pre-paint script in layout.tsx and useSplashEntered.ts. sessionStorage, not
 // localStorage: it should come back on a new session, not be dismissed forever.
-const SPLASH_KEY = "gj_splash_herside";
+const SPLASH_KEY = "gj_splash_tennesseeyouagain";
 
 // Must match the #splash-overlay opacity transition in globals.css.
 const EXIT_MS = 600;
 
-// `released` comes from the server layout rather than the clock here, so the
-// prerendered copy and the hydrated copy always agree.
-export default function Splash({ released }: { released: boolean }) {
-  const copy = herSideCopy(released);
+export default function Splash() {
   const pathname = usePathname();
 
   // The pre-paint script in the root layout handles the first paint. This
@@ -67,115 +63,110 @@ export default function Splash({ released }: { released: boolean }) {
       id="splash-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Water At A Wedding (her side.), Greylan James and Gabriella Rose"
-      className="splash-root overflow-hidden bg-black"
+      aria-label="Tennessee You Again by Greylan James, out now"
+      className="splash-root overflow-y-auto bg-[#22241E]"
     >
-      {/* Photo. On mobile it's scaled up and lifted so the arch sits right
-          under the names, matching the mobile key art; otherwise a tall phone
-          shows the photo's whole black top as an empty band. On desktop the
-          photo sits in a centered column whose sides feather into the black. */}
-      <div
-        className="splash-photo absolute inset-x-0 -top-[16%] h-[114%] md:top-0 md:h-full md:left-1/2 md:right-auto md:w-[68vw] md:-translate-x-1/2"
-        style={{ animation: "splashFade 1200ms ease both" }}
-      >
-        <Image
-          src="/backgrounds/GreylanJames_WaterAtAWedding_herside.jpg"
-          alt="Greylan James in a black ball cap and t-shirt, with Gabriella Rose in a white slip dress looking back over her shoulder, inside a candlelit chapel"
-          fill
-          priority
-          sizes="(min-width: 768px) 68vw, 100vw"
-          className="object-cover object-[55%_center] md:object-[center_49%]"
-        />
-      </div>
-
-      {/* Darken the bottom so the buttons and legal line stay legible. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black via-black/60 to-transparent"
-      />
-
-      {/* Artist names. Pinned to the top corners on desktop, dropped lower on
-          mobile so they sit in the black above the arch. */}
-      <div
-        className={`${naskh.className} absolute inset-x-0 top-[6%] flex justify-between px-[6.5%] text-[12px] uppercase tracking-[0.04em] [word-spacing:0.3em] min-[400px]:text-[14px] md:top-[5%] md:px-[3.3%] md:text-[clamp(18px,1.5vw,30px)]`}
-        style={{ color: RED, animation: "splashFadeUp 700ms ease 400ms both" }}
-      >
-        <p>Greylan James</p>
-        <p>Gabriella Rose</p>
-      </div>
-
-      {/* Title, centered over the pair. The wrapper does the positioning so
-          the fade-up transform on the heading can't override it. */}
-      <div className="absolute inset-x-0 top-[46%] -translate-y-1/2">
-        <h2
-          className="text-center text-[34px] font-bold leading-none text-white min-[400px]:text-[38px] md:text-[clamp(36px,2.6vw,56px)]"
-          style={{ animation: "splashFadeUp 700ms ease 600ms both" }}
+      {/* Cover art on one side, the lockup on the other. Stacked on phones,
+          cover first. min-h-full plus the overlay's own scroll keeps short
+          phones from clipping the Terms notice. */}
+      <div className="flex min-h-full flex-col items-center justify-center gap-7 px-5 py-8 md:flex-row md:gap-[6vw] md:px-[6vw] md:py-12">
+        <div
+          className="relative aspect-square w-[min(78vw,34svh)] shrink-0 md:w-[min(40vw,72vh,640px)]"
+          style={{ animation: "splashFade 1200ms ease both" }}
         >
-          <SmearText>her side.</SmearText>
-        </h2>
-        {/* Release date, a step smaller and softer than the title so it reads
-            as part of the same smeared lockup without competing with it. */}
-        <p
-          className="mt-2 text-center text-[17px] font-semibold leading-none text-white/75 [filter:blur(0.3px)] md:mt-3 md:text-[clamp(18px,1.3vw,26px)]"
-          style={{ animation: "splashFadeUp 700ms ease 700ms both" }}
-        >
-          <SmearText>{copy.date}</SmearText>
-        </p>
-      </div>
-
-      {/* CTAs and the arbitration notice. */}
-      <div
-        className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-8 md:pb-10"
-        style={{ animation: "splashFadeUp 700ms ease 800ms both" }}
-      >
-        <div className="flex w-full max-w-[320px] flex-col gap-3 min-[480px]:max-w-none min-[480px]:w-auto min-[480px]:flex-row min-[480px]:gap-4">
-          <a
-            href={herSide.link!}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${cormorant.className} ${BUTTON} bg-white text-black transition-opacity hover:opacity-85`}
-          >
-            {copy.cta}
-            <span className="sr-only"> (opens in new tab)</span>
-          </a>
-          <button
-            type="button"
-            onClick={enterSite}
-            className={`${cormorant.className} ${BUTTON} border border-white/40 text-white/85 transition-colors hover:border-white/80 hover:text-white`}
-          >
-            enter site
-          </button>
+          <Image
+            src={tennesseeYouAgain.cover}
+            alt="Tennessee You Again cover art: Greylan James from behind in an orange number 16 football jersey and black cap, walking through a field under an overcast sky"
+            fill
+            priority
+            sizes="(min-width: 768px) 40vw, 78vw"
+            className="object-cover"
+          />
         </div>
 
-        <p
-          className={`${cormorant.className} mt-5 max-w-[340px] text-center text-[13px] font-semibold leading-snug text-white/65 min-[480px]:max-w-[460px]`}
-        >
-          By entering, you consent to our{" "}
-          <Link href="/legal/terms" className="text-white/90 underline underline-offset-2 hover:text-white">
-            Terms &amp; Conditions
-          </Link>
-          , including{" "}
-          <Link href="/legal/terms#section-17" className="text-white/90 underline underline-offset-2 hover:text-white">
-            binding arbitration
-          </Link>{" "}
-          and a{" "}
-          <Link
-            href="/legal/terms#class-action-waiver"
-            className="text-white/90 underline underline-offset-2 hover:text-white"
+        {/* Lockup, CTAs, and the arbitration notice. */}
+        <div className="flex w-full flex-col items-center text-center md:w-[min(560px,40vw)]">
+          {/* "Out Now" kicker, then the title art in the headline orange with
+              the white wordmark under it, the lockup from the release's color
+              palette sheet. */}
+          <p
+            className={`${freshman.className} mb-4 text-[18px] uppercase leading-none tracking-[0.12em] text-[#B6A394] md:mb-5 md:text-[22px]`}
+            style={{ animation: "splashFadeUp 700ms ease 300ms both" }}
           >
-            waiver of class action rights
-          </Link>
-          .
-        </p>
+            Out Now
+          </p>
+          <h2 className="w-full max-w-[360px] md:max-w-none" style={{ animation: "splashFadeUp 700ms ease 400ms both" }}>
+            <Image
+              src="/logos/GreylanJames_TennesseeYouAgain_TitleTrimmed.png"
+              alt="Tennessee You Again"
+              width={2498}
+              height={159}
+              priority
+              sizes="(min-width: 768px) 40vw, 360px"
+              className="h-auto w-full"
+            />
+          </h2>
+          <Image
+            src="/logos/GreylanJames_LogoWhite.png"
+            alt="Greylan James"
+            width={1104}
+            height={566}
+            sizes="(min-width: 768px) 11vw, 110px"
+            className="mt-5 h-auto w-[110px] md:mt-7 md:w-[clamp(125px,10.5vw,180px)]"
+            style={{ animation: "splashFadeUp 700ms ease 550ms both" }}
+          />
+
+          <div
+            className="mt-6 flex w-full flex-col items-center md:mt-8"
+            style={{ animation: "splashFadeUp 700ms ease 800ms both" }}
+          >
+            <div className="flex w-full max-w-[320px] flex-col gap-3 min-[480px]:w-auto min-[480px]:max-w-none min-[480px]:flex-row min-[480px]:gap-4 md:flex-col md:gap-3 lg:flex-row lg:gap-4">
+              <a
+                href={tennesseeYouAgain.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${BUTTON} bg-[#C98155] text-[#22241E] transition-opacity hover:opacity-85`}
+              >
+                Listen Now
+                <span className="sr-only"> to Tennessee You Again (opens in new tab)</span>
+              </a>
+              <button
+                type="button"
+                onClick={enterSite}
+                className={`${BUTTON} border border-[#B6A394]/50 text-[#B6A394] transition-colors hover:border-[#B6A394]`}
+              >
+                Enter Site
+              </button>
+            </div>
+
+            <p
+              className={`${sourceSans.className} mt-5 max-w-[340px] text-[13px] font-medium leading-snug text-[#B6A394]/80 min-[480px]:max-w-[460px]`}
+            >
+              By entering, you consent to our{" "}
+              <Link href="/legal/terms" className="text-[#B6A394] underline underline-offset-2 hover:text-[#E1DDCE]">
+                Terms &amp; Conditions
+              </Link>
+              , including{" "}
+              <Link
+                href="/legal/terms#section-17"
+                className="text-[#B6A394] underline underline-offset-2 hover:text-[#E1DDCE]"
+              >
+                binding arbitration
+              </Link>{" "}
+              and a{" "}
+              <Link
+                href="/legal/terms#class-action-waiver"
+                className="text-[#B6A394] underline underline-offset-2 hover:text-[#E1DDCE]"
+              >
+                waiver of class action rights
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
       </div>
 
       <style>{`
-        @media (min-width: 768px) {
-          .splash-photo {
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
-          }
-        }
         @keyframes splashFade {
           from { opacity: 0; }
           to { opacity: 1; }

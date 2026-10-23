@@ -7,18 +7,16 @@ import PageViewTracker from "@/components/consent/PageViewTracker";
 import TermsGate from "@/components/consent/TermsGate";
 import AnchorScroll from "@/components/shared/AnchorScroll";
 import Splash from "@/components/splash/Splash";
-import { SmearDefs } from "@/components/herside/SmearText";
-import { isHerSideOut } from "@/lib/releases";
 
 // Re-render every route at most hourly so the pre-save copy flips to "out now"
-// on release day without a deploy. See isHerSideOut in src/lib/releases.ts.
+// on release day without a deploy. See isAlbumOut in src/lib/releases.ts.
 export const revalidate = 3600;
 import "./globals.css";
 
 // Keep in sync with SPLASH_KEY in src/components/splash/Splash.tsx. Read before
 // paint so a visitor who already entered this session never sees the splash
 // flash, and a visitor landing on /legal never sees it at all.
-const SPLASH_KEY = "gj_splash_herside";
+const SPLASH_KEY = "gj_splash_tennesseeyouagain";
 const splashScript = `try{var e=document.documentElement;if(sessionStorage.getItem('${SPLASH_KEY}')){e.classList.add('splash-entered')}else if(location.pathname.indexOf('/legal')===0){e.classList.add('splash-exempt')}}catch(err){}`;
 
 const knockout = localFont({
@@ -90,10 +88,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {/* Splash must be the first child of <body> so it exists on first
             paint. Shown once per browser session; never on /legal routes. */}
-        <Splash released={isHerSideOut()} />
-        {/* Filters for the "her side." smear lockup, used by the splash and
-            the home hero. */}
-        <SmearDefs />
+        <Splash />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[100] focus:bg-brand-cream focus:px-6 focus:py-3 focus:text-brand-brown focus:font-headline focus:text-[20px] focus:uppercase focus:tracking-wide"

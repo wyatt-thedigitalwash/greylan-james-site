@@ -9,30 +9,12 @@ export type Release = {
   link: string | null;
 };
 
-/** The current campaign. Used by the splash, the home hero, and the lists below. */
-export const herSide: Release = {
-  title: 'Water At A Wedding (her side.)',
-  cover: '/covers/GreylanJames_WaterAtAWedding_HerSide_GabriellaRose_Cover.jpg',
-  link: 'https://greylanjames.ffm.to/waterataweddingherside.OWE',
-};
-
-// Midnight Eastern on release day, when the single goes live on US services.
-// The smart link stays the same; it flips from pre-save to listen on its own.
-const HER_SIDE_RELEASE = new Date('2026-10-07T00:00:00-04:00');
-
-// Call this from server components only and pass the result down as a prop. A
-// client component reading the clock itself would disagree with prerendered
-// HTML on either side of release day and trip a hydration mismatch. The root
-// layout revalidates hourly, so every route picks up the flip on its own.
-export function isHerSideOut(): boolean {
-  return Date.now() >= HER_SIDE_RELEASE.getTime();
-}
-
-export function herSideCopy(released: boolean) {
-  return released
-    ? { kicker: 'New Single, Out Now', cta: 'Listen Now', date: 'out now' }
-    : { kicker: 'New Single, Out October 7', cta: 'Pre-Save', date: 'october 7' };
-}
+/** The current campaign. Used by the splash and the lists below. Out now. */
+export const tennesseeYouAgain = {
+  title: 'Tennessee You Again',
+  cover: '/covers/GreylanJames_TennesseeYouAgain_Cover.jpg',
+  link: 'https://greylanjames.ffm.to/tennesseeyouagain.OWE',
+} satisfies Release;
 
 /** The debut album. Headlines the home hero. No cover art supplied yet. */
 export const album = {
@@ -43,7 +25,10 @@ export const album = {
 // Midnight Eastern on release day. Same smart link before and after.
 const ALBUM_RELEASE = new Date('2026-11-13T00:00:00-05:00');
 
-// Server components only, for the same hydration reason as isHerSideOut.
+// Call this from server components only and pass the result down as a prop. A
+// client component reading the clock itself would disagree with prerendered
+// HTML on either side of release day and trip a hydration mismatch. The root
+// layout revalidates hourly, so every route picks up the flip on its own.
 export function isAlbumOut(): boolean {
   return Date.now() >= ALBUM_RELEASE.getTime();
 }
@@ -55,7 +40,12 @@ export function albumCopy(released: boolean) {
 }
 
 export const releases: Release[] = [
-  herSide,
+  tennesseeYouAgain,
+  {
+    title: 'Water At A Wedding (her side.)',
+    cover: '/covers/GreylanJames_WaterAtAWedding_HerSide_GabriellaRose_Cover.jpg',
+    link: 'https://greylanjames.ffm.to/waterataweddingherside.OWE',
+  },
   {
     title: 'Small Town',
     cover: '/covers/GreylanJames_SmallTown_Cover.jpg',

@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 // Session key mirrored from Splash.tsx and the pre-paint script in layout.tsx.
-const SPLASH_KEY = "gj_splash_herside";
+const SPLASH_KEY = "gj_splash_tennesseeyouagain";
 
 // The splash signals its state with classes on <html>, set by the pre-paint
 // script in the root layout and by Splash.tsx on dismissal:
