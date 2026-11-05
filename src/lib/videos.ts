@@ -9,8 +9,12 @@ export type Video = {
 };
 
 export const videos: Video[] = [
-  // The two official videos lead the list, so they are the pair the home page
-  // surfaces and the first thing on /videos.
+  // The official videos lead the list. The home page surfaces the first two, and
+  // they are the first thing on /videos.
+  {
+    title: 'Tennessee You Again (Official Video)',
+    id: 'f_wSdiKuCe8',
+  },
   {
     title: 'Water At A Wedding (Official Music Video)',
     id: 'q5nsBKvCTPU',
