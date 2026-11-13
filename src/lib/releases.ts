@@ -9,7 +9,7 @@ export type Release = {
   link: string | null;
 };
 
-/** The current campaign. Used by the splash and the lists below. Out now. */
+/** The current single. Leads the release lists below. */
 export const tennesseeYouAgain = {
   title: 'Tennessee You Again',
   cover: '/covers/GreylanJames_TennesseeYouAgain_Cover.jpg',

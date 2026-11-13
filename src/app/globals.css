@@ -427,29 +427,3 @@ section[data-bg="light"] :focus-visible {
   background: rgba(225, 221, 206, 0.1);
   border-color: var(--brand-cream);
 }
-
-/* ─── Splash / Pre-Home Overlay ───
-   Full-screen "Tennessee You Again" release card shown once per browser session, never
-   on /legal routes. State lives as a class on <html>, set before paint by the
-   inline script in the root layout, so a visitor who already entered never
-   sees it flash. */
-#splash-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  opacity: 1;
-  transition: opacity 600ms ease;
-}
-#splash-overlay.is-exiting {
-  opacity: 0;
-  pointer-events: none;
-}
-html.splash-entered #splash-overlay,
-html.splash-exempt #splash-overlay {
-  display: none;
-}
-
-/* Lock scroll while the splash is up, but never on exempt (legal) routes. */
-html:not(.splash-entered):not(.splash-exempt) body {
-  overflow: hidden;
-}

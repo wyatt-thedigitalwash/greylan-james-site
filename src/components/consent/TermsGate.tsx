@@ -2,20 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { readConsent } from "./consent";
-import { useSplashEntered, markSplashEntered } from "./useSplashEntered";
 
 // Puts the arbitration / class-action-waiver notice in front of the visitor
-// instead of burying it in a footer link. Acknowledgement persists separately
-// from cookie consent. Two distinct jobs:
-//
-//   Case A -- deep-linked to /legal without having entered. The splash is
-//     hidden on that route, so there is no "Enter Site" button anywhere on the
-//     page. This notice becomes the way in, and stays available regardless of
-//     any past acknowledgement so the visitor can never be stranded.
-//   Case B -- the one-time backup notice after a cookie decision, shown only
-//     once the visitor has actually entered so it never stacks on the splash.
+// instead of burying it in a footer link. Shown once ever, right after the
+// cookie decision, so it never stacks on the cookie banner. Acknowledgement
+// persists separately from cookie consent.
 const STORAGE_KEY = "gj-terms-gate";
 
 function readAcknowledged(): boolean {
@@ -36,28 +28,11 @@ function writeAcknowledged(): void {
 }
 
 export default function TermsGate() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const entered = useSplashEntered();
   const [show, setShow] = useState(false);
 
-  const onExempt = pathname.startsWith("/legal");
-
   const maybeShow = useCallback(() => {
-    // Case A: the escape hatch. Always available, even if they acknowledged on
-    // a previous visit, because it is their only way into the site from here.
-    if (!entered && onExempt) {
-      setShow(true);
-      return;
-    }
-    // Case B: shown once ever, after a cookie decision and only once entered,
-    // so the prompts never stack on a first-time visitor.
-    if (readAcknowledged()) {
-      setShow(false);
-      return;
-    }
-    setShow(entered && !!readConsent());
-  }, [entered, onExempt]);
+    setShow(!readAcknowledged() && !!readConsent());
+  }, []);
 
   useEffect(() => {
     maybeShow();
@@ -68,12 +43,6 @@ export default function TermsGate() {
   const dismiss = () => {
     writeAcknowledged();
     setShow(false);
-    // Case A: treat this click as the entry action they never got to make, and
-    // send them to the site rather than leaving them sitting on a legal page.
-    if (!entered && onExempt) {
-      markSplashEntered();
-      router.push("/");
-    }
   };
 
   if (!show) return null;
@@ -100,7 +69,7 @@ export default function TermsGate() {
           .
         </p>
         <button type="button" onClick={dismiss} className="cc-btn cc-btn-primary mt-3 w-full sm:mt-5">
-          {entered ? "Got It" : "Enter Site"}
+          Got It
         </button>
       </div>
     </div>
