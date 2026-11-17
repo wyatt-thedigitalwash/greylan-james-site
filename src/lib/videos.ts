@@ -9,8 +9,12 @@ export type Video = {
 };
 
 export const videos: Video[] = [
-  // The official videos lead the list. The home page surfaces the first two, and
-  // they are the first thing on /videos.
+  // The newest release leads, then the official videos. The home page surfaces
+  // the first two, and they are the first thing on /videos.
+  {
+    title: 'Night In Shining Armor (Visualizer)',
+    id: 'BrjHmXbIyqc',
+  },
   {
     title: 'Tennessee You Again (Official Video)',
     id: 'f_wSdiKuCe8',
