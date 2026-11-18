@@ -7,10 +7,13 @@ import {
   type Category,
   type Consent,
   emptyConsent,
+  enforceGpc,
+  gpcEnabled,
   readConsent,
   writeConsent,
 } from "./consent";
 import { applyConsent, revokeConsent } from "./injectScripts";
+import { scrubDeniedCookies } from "./privacy";
 
 const NON_NECESSARY: Category[] = ["analytics", "advertising", "functional", "social"];
 
@@ -30,6 +33,7 @@ export default function CookieConsent() {
   // the banner to a first-time visitor.
   useEffect(() => {
     const saved = readConsent();
+    scrubDeniedCookies(saved);
     if (saved) {
       applyConsent(saved);
       applied.current = saved;
@@ -73,7 +77,10 @@ export default function CookieConsent() {
     };
   }, [showModal, closeModal]);
 
-  const commit = useCallback((consent: Consent) => {
+  const commit = useCallback((choice: Consent) => {
+    // A Global Privacy Control signal is an opt-out of sale/sharing, so it
+    // overrides an Advertising grant -- even one from Accept All.
+    const consent = enforceGpc(choice);
     writeConsent(consent);
     // If the user turned OFF a category that was already injected this session,
     // a reload is required to clear those scripts/cookies.
@@ -184,9 +191,9 @@ export default function CookieConsent() {
                       {cat.description}
                     </p>
                   </div>
-                  {cat.locked ? (
+                  {cat.locked || (cat.key === "advertising" && gpcEnabled()) ? (
                     <span className="mt-1 shrink-0 font-body text-xs uppercase tracking-wide text-text-accent/60">
-                      Always on
+                      {cat.locked ? "Always on" : "Off (Global Privacy Control)"}
                     </span>
                   ) : (
                     <button

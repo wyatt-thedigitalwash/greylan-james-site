@@ -10,11 +10,15 @@
 // and are gated on the Advertising category.
 
 import type { Consent } from "./consent";
+import { setGoogleConsentMode } from "./privacy";
 import { grantedCategories, loadTagManager, pushConsentSignal } from "@/lib/analytics";
 import { CATEGORY_COOKIES, clearCookies, loadAdPixels } from "@/lib/adPixels";
 
 /** Inject scripts for every category the user has consented to. Additive only. */
 export function applyConsent(consent: Consent) {
+  // Consent Mode first, so every Google tag below honours the exact choice
+  // (e.g. no Google Signals ad data on an analytics-only or GPC visit).
+  setGoogleConsentMode(consent);
   if (consent.advertising) loadAdPixels(consent.analytics);
 
   const categories = grantedCategories(consent);
