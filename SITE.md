@@ -90,7 +90,10 @@ Ported from the previous WordPress site. One Google Tag Manager container, GTM-P
 - GA4, measurement ID G-DMLPVHD2YG, configured with send_page_view false
 - Audigent advertising ID-sync pixel, a.ad.gt/api/v1/u/matches/139
 
-Neither fires on container load. Both wait on a dataLayer event named evidonConsentGiven carrying a consentCategories list, because the old site gated them behind the Evidon consent notice, account 7155. This site keeps its own cookie banner and emits that same event, so the container needs no changes. Analytics consent sends "performance and analytics", advertising consent sends "online advertising". See src/lib/analytics.ts.
+Tags load only after cookie consent (src/components/consent/injectScripts.ts + shared labelTags.ts):
+- Analytics consent: GA4 G-DMLPVHD2YG loaded directly.
+- Advertising consent: Google Ads AW-17574370157, Meta 1858545644702596, TikTok D26CTKBC77U110BN94C0, and the GTM container. The container counts as Advertising because the label controls its contents (it injects Evidon and the Audigent pixel).
+The container's tags wait on a dataLayer event named evidonConsentGiven carrying a consentCategories list (from the old Evidon notice, account 7155); the site emits that event with the granted categories, so the container needs no changes. With everything accepted, the container's own GA4 tag may also count page views alongside the direct GA4 tag.
 
 Not ported, they are WordPress plugins bound to UMG's own backend: UMG AAL (party_service_id 101361009), Appreciation Engine social sign-in, UMG eCRM. The Sign Up form replaces them.
 
