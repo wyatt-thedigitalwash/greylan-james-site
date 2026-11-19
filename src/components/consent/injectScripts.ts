@@ -12,7 +12,7 @@
 import type { Consent } from "./consent";
 import { setGoogleConsentMode } from "./privacy";
 import { grantedCategories, loadTagManager, pushConsentSignal } from "@/lib/analytics";
-import { CATEGORY_COOKIES, clearCookies, loadAdPixels } from "@/lib/adPixels";
+import { loadAdPixels } from "@/lib/adPixels";
 
 /** Inject scripts for every category the user has consented to. Additive only. */
 export function applyConsent(consent: Consent) {
@@ -35,10 +35,8 @@ export function applyConsent(consent: Consent) {
 }
 
 /**
- * Remove the cookies left behind by any category the visitor just turned off.
+ * Remove the cookies left behind by any category the visitor just turned off
+ * (shared implementation: Consent Mode deny first, then clear by category).
  * The caller reloads the page afterwards so the scripts themselves are gone too.
  */
-export function revokeConsent(prev: Consent, next: Consent) {
-  if (prev.analytics && !next.analytics) clearCookies(CATEGORY_COOKIES.analytics);
-  if (prev.advertising && !next.advertising) clearCookies(CATEGORY_COOKIES.advertising);
-}
+export { revokeConsent } from "./privacy";
