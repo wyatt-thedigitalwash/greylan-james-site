@@ -18,8 +18,16 @@ const navLinks = [
   { href: '/videos', label: 'Videos' },
   { href: '/tour', label: 'Tour' },
   { href: '/about', label: 'About' },
+  { href: 'https://greylanjames.myshopify.com/', label: 'Shop', external: true },
   { href: '/sign-up', label: 'Sign Up' },
 ];
+
+// Off-site nav links (the store) open in a new tab and say so to screen readers.
+function externalProps(link: { label: string; external?: boolean }) {
+  return link.external
+    ? { target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${link.label} (opens in new tab)` }
+    : {};
+}
 
 const socialLinks = [
   { href: 'https://www.instagram.com/greylanjames/', label: 'Instagram', Icon: FaInstagram },
@@ -193,6 +201,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              {...externalProps(link)}
               className="font-headline text-[24px] uppercase tracking-wide text-brand-cream hover:text-brand-cream/70 transition-colors"
             >
               {link.label}
@@ -270,6 +279,7 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={closeMenu}
+                {...externalProps(link)}
                 className="font-headline text-4xl uppercase tracking-wide text-brand-cream hover:text-brand-cream/70 transition-colors duration-300"
                 style={{
                   opacity: menuVisible ? 1 : 0,
