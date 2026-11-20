@@ -11,14 +11,14 @@ import Texture from '@/components/Texture';
 import TornEdge from '@/components/TornEdge';
 import VideoTheater from '@/components/VideoTheater';
 
-// Closing site index. Every destination in the sitemap, so it reads as the last
-// way to navigate rather than a partial repeat of the header.
+// Closing site index, the last way to navigate before the email capture below.
+// Sign Up is left out because the email capture directly beneath covers it.
 const indexLinks = [
   { href: '/music', label: 'Music' },
   { href: '/videos', label: 'Videos' },
   { href: '/tour', label: 'Tour' },
   { href: '/about', label: 'About' },
-  { href: '/sign-up', label: 'Sign Up' },
+  { href: 'https://greylanjames.myshopify.com/', label: 'Shop', external: true },
 ];
 
 export const metadata: Metadata = {
@@ -293,6 +293,9 @@ export default async function Home() {
             <Link
               key={item.href}
               href={item.href}
+              {...('external' in item && item.external
+                ? { target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${item.label} (opens in new tab)` }
+                : {})}
               className={`font-headline text-[56px] leading-[0.9] uppercase tracking-tight text-brand-cream hover:text-brand-cream/60 transition-colors py-5 md:py-0 md:text-[6.5vw] xl:text-[96px]${
                 i < arr.length - 1 ? ' border-b border-brand-cream/20 md:border-b-0' : ''
               }`}
